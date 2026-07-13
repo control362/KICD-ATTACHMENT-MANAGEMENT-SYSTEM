@@ -1,92 +1,76 @@
 # KICD Attachment Management System
 
-This repository contains the complete KICD Attachment Management System, consisting of a Spring Boot backend and a vanilla HTML/JS/CSS frontend styled with TailwindCSS.
+This repository contains the complete KICD Attachment Management System, consisting of a Spring Boot backend and a modern Next.js frontend styled with TailwindCSS.
 
 ## Prerequisites
 
 Before running the application, ensure you have the following installed:
 1. **Java Development Kit (JDK)**: Version 17 or higher.
 2. **PostgreSQL**: Version 12 or higher.
-3. **Node.js**: (Optional) For running a local HTTP server for the frontend, e.g., using `serve` or `http-server`.
+3. **Node.js**: Version 18 or higher (for running the Next.js frontend).
 4. **Git**: For version control.
 
 ---
 
 ## 1. Database Setup
 
-The backend relies on PostgreSQL. You need to create a database and optionally configure your database credentials.
+The backend relies on PostgreSQL. You need to create a database and configure your credentials.
 
 1. Open your PostgreSQL terminal (e.g., `psql` or pgAdmin).
 2. Create the database used by the application:
    ```sql
    CREATE DATABASE kicd_db;
    ```
-3. By default, the application is configured to connect with:
-   - **Username**: `postgres`
-   - **Password**: `admin123`
+3. By default, the application connects with `postgres`/`admin123`. If your credentials differ, update them in:
+`BACKEND-main/src/main/resources/application.properties`
 
-*If your local PostgreSQL credentials differ, you must update them in the backend configuration file located at:*
-`BACKEND-main/src/main/resources/application-dev.yml`
-
-*Note: The backend uses **Flyway** for database migrations. You do not need to manually create any tables; simply starting the backend will automatically set up your database schema.*
+*Note: The backend uses **Flyway** for migrations. Starting the backend will automatically set up the schema and seed default data.*
 
 ---
 
-## 2. Running the Backend
+## 2. Running the Backend (Spring Boot)
 
-The backend is built with Spring Boot and uses Maven.
-
-1. Open your terminal (Command Prompt, PowerShell, or Git Bash).
-2. Navigate into the backend directory:
+1. Open your terminal and navigate to the backend directory:
    ```bash
    cd BACKEND-main
    ```
-3. Run the application using the included Maven Wrapper:
-   - **On Windows**:
-     ```powershell
-     .\mvnw spring-boot:run
-     ```
-   - **On macOS/Linux**:
-     ```bash
-     ./mvnw spring-boot:run
-     ```
+2. Run the application:
+   - **Windows**: `.\mvnw spring-boot:run`
+   - **macOS/Linux**: `./mvnw spring-boot:run`
 
-4. The backend will start up and run on **`http://localhost:8080`**. Wait until you see the message `Started KicdApplication` in your terminal.
+The backend runs on **`http://localhost:8081`** by default (configured in `application.properties`).
 
 ---
 
-## 3. Running the Frontend
+## 3. Running the Frontend (Next.js)
 
-The frontend is a vanilla JavaScript application with routing. It must be served over a local HTTP server (simply double-clicking the `index.html` file in your browser will cause CORS and module issues).
+The frontend is a robust Next.js application built with App Router and Tailwind CSS.
 
-1. Open a **new** terminal window.
-2. Navigate into the frontend app directory:
+1. Open a **new** terminal window and navigate to the frontend directory:
    ```bash
-   cd "kicd-frontend-app (1)/app"
+   cd kicd-nextjs-client
    ```
-3. Serve the directory over HTTP. You can use any lightweight server:
-   
-   **Using Python (Recommended if you have Python installed):**
+2. Install dependencies:
    ```bash
-   python -m http.server 3000
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
    ```
 
-   **Using Node.js/npx:**
-   ```bash
-   npx serve . -p 3000
-   ```
-   *Alternatively, if you use VS Code, you can right-click the `index.html` file and select "Open with Live Server".*
-
-4. Open your browser and navigate to the frontend URL (e.g., **`http://localhost:3000`**).
+The frontend runs on **`http://localhost:3000`**. Open this URL in your browser to access the system.
 
 ---
 
-## System Users & Roles
+## 4. Default Logins & System Roles
 
-Once both servers are running, you can access the system. The platform manages three distinct roles:
+The platform manages three distinct roles. To get you started immediately, the system automatically seeds the following default accounts (all passwords are `password123`):
 
-- **STUDENT**: Applicants looking for attachment opportunities. They can view opportunities, update their profiles, and submit applications.
-- **HR_OFFICER**: Reviewers who manage incoming applications, assess candidates, and accept/reject them.
-- **ADMIN**: System administrators who manage departments, staff accounts, and overall platform configurations.
+| Role | Email | Password | Description |
+| :--- | :--- | :--- | :--- |
+| **ADMIN** | `admin@kicd.ac.ke` | `password123` | Full system administrator: manages staff, departments, and system configs. |
+| **HR_OFFICER** | `hr@kicd.ac.ke` | `password123` | Reviewer who evaluates and accepts/rejects applications. |
+| **STUDENT** | `student@test.com` | `password123` | Applicant who browses opportunities and tracks their application status. |
 
-*You can register a new student account via the frontend interface. For HR and Admin roles, credentials must be manually seeded or created by an existing Admin.*
+*You can also register a brand new student account via the public landing page interface.*
