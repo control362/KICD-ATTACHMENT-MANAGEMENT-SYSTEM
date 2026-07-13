@@ -1,0 +1,27 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Java / Maven
+target/
+*.jar
+*.war
+*.ear
+.mvn/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.eclipse
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.*.local

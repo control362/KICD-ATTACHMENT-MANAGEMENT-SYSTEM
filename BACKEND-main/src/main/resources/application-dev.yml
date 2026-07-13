@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/kicd_db  # change to your local postgres database
+    username: postgres         # change to your local postgres username
+    password: admin123         # change to your local postgres password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 20000
+      connection-test-query: SELECT 1
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    validate-on-migrate: true
+    out-of-order: false
+    # NOTE: clean-on-validation-error was removed. It silently drops and
+    # rebuilds the whole database on any migration mismatch, which is not
+    # something you want even in dev the moment there's data worth keeping.
+    # If a migration checksum mismatch happens, fix or repair it explicitly:
+    #   ./mvnw flyway:repair
+
+  jpa:
+    hibernate:
+      ddl-auto: validate             # Hibernate validates against Flyway schema — never create/update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org.flywaydb: DEBUG              # see every migration step in the console
+    org.hibernate.SQL: DEBUG
+    org.springframework.security: DEBUG

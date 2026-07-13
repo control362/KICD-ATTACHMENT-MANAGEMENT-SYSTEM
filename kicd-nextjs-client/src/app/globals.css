@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-navy: #1e4d92;
+  --color-brand-gold: #d4af37;
+  --color-brand-light: #f2f4f6;
+  --color-on-secondary-container: #6f4900;
+  --color-primary: #003674;
+  --color-secondary: #815500;
+  --color-on-secondary-fixed: #291800;
+  --color-on-secondary-fixed-variant: #624000;
+  --color-on-primary-container: #a1c0ff;
+  --color-surface-dim: #d8dadc;
+  --color-surface: #f7f9fb;
+  --color-background: #f7f9fb;
+  --color-on-tertiary: #ffffff;
+  --color-secondary-fixed: #ffddb2;
+  --color-outline: #737782;
+  --color-primary-fixed-dim: #acc7ff;
+  --color-error-container: #ffdad6;
+  --color-error: #EF4444;
+  --color-inverse-on-surface: #eff1f3;
+  --color-text-secondary: #475569;
+  --color-tertiary-container: #3b5065;
+  --color-surface-container-high: #e6e8ea;
+  --color-primary-fixed: #d7e2ff;
+  --color-outline-variant: #c3c6d2;
+  --color-border-light: #E2E8F0;
+  --color-on-error: #ffffff;
+  --color-on-surface: #191c1e;
+  --color-on-primary-fixed: #001a40;
+  --color-on-surface-variant: #434751;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container-highest: #e0e3e5;
+  --color-on-tertiary-container: #acc2db;
+  --color-on-error-container: #93000a;
+  --color-tertiary-fixed-dim: #b3c9e2;
+  --color-text-primary: #0F172A;
+  --color-primary-container: #1e4d92;
+  --color-on-secondary: #ffffff;
+  --color-surface-container: #eceef0;
+  --color-surface-subtle: #F1F5F9;
+  --color-surface-bright: #f7f9fb;
+  --color-on-background: #191c1e;
+  --color-success: #10B981;
+  --color-on-tertiary-fixed: #051d30;
+  --color-surface-variant: #e0e3e5;
+  --color-surface-default: #FFFFFF;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-primary: #ffffff;
+  --color-secondary-container: #fdb747;
+  --color-inverse-surface: #2d3133;
+  --color-inverse-primary: #acc7ff;
+  --color-secondary-fixed-dim: #ffb94c;
+  --color-on-tertiary-fixed-variant: #34495e;
+  --color-tertiary-fixed: #cfe5ff;
+  --color-surface-tint: #325da3;
+  --color-tertiary: #24394d;
+  --color-on-primary-fixed-variant: #12458a;
+  --color-danger: #B3412E;
+  --color-warning: #C97A1A;
+  --color-success-container: #DCF3E7;
+  --color-danger-container: #F6E1DC;
+
+  --font-sans: "Inter", sans-serif;
+  --font-serif: "Lora", serif;
+  --font-headline-sm: "Inter";
+  --font-display-lg: "Inter";
+  --font-body-md: "Inter";
+  --font-headline-lg-mobile: "Inter";
+  --font-body-sm: "Inter";
+  --font-label-sm: "Inter";
+  --font-label-md: "Inter";
+  --font-headline-md: "Inter";
+  --font-body-lg: "Inter";
+  --font-headline-lg: "Inter";
+
+  --radius-sm: 0.25rem;
+  --radius-DEFAULT: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --spacing-2xl: 48px;
+  --spacing-margin-desktop: 40px;
+  --spacing-xs: 4px;
+  --spacing-md: 16px;
+  --spacing-sm: 8px;
+  --spacing-gutter: 24px;
+  --spacing-3xl: 64px;
+  --spacing-margin-mobile: 16px;
+  --spacing-lg: 24px;
+  --spacing-base: 4px;
+  --spacing-xl: 32px;
+
+  --text-headline-sm: 20px;
+  --text-headline-sm--line-height: 28px;
+  --text-headline-sm--font-weight: 600;
+
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 60px;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 700;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--font-weight: 400;
+
+  --text-headline-lg-mobile: 24px;
+  --text-headline-lg-mobile--line-height: 32px;
+  --text-headline-lg-mobile--font-weight: 600;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--font-weight: 400;
+
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 16px;
+  --text-label-sm--letter-spacing: 0.02em;
+  --text-label-sm--font-weight: 500;
+
+  --text-label-md: 14px;
+  --text-label-md--line-height: 20px;
+  --text-label-md--letter-spacing: 0.01em;
+  --text-label-md--font-weight: 600;
+
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--font-weight: 600;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body-lg--font-weight: 400;
+
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--letter-spacing: -0.01em;
+  --text-headline-lg--font-weight: 600;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    font-family: var(--font-sans);
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 4px; }
+}
+
+@layer utilities {
+  .hero-gradient { background: linear-gradient(135deg, rgba(0, 54, 116, 0.9) 0%, rgba(30, 77, 146, 0.8) 100%); }
+  .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
+  .ambient-shadow { box-shadow: 0px 4px 12px rgba(0, 54, 116, 0.04); }
+  .hover-elevate:hover { box-shadow: 0px 8px 24px rgba(0, 54, 116, 0.08); transform: translateY(-1px); }
+  
+  .skeleton { 
+    background: linear-gradient(90deg, #e8f0ec 25%, #dde4e1 37%, #e8f0ec 63%); 
+    background-size: 400% 100%; 
+    animation: skeleton-loading 1.4s ease infinite; 
+  }
+
+  @keyframes skeleton-loading { 
+    0% { background-position: 100% 50%; } 
+    100% { background-position: 0 50%; } 
+  }
+}
