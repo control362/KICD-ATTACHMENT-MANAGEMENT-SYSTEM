@@ -67,12 +67,12 @@ npm run dev
 
 ## 🔐 Default Login Credentials
 
-The database is automatically seeded with default accounts to get you started. All default passwords are **`password123`**.
+The database is automatically seeded with default accounts to get you started. All default passwords are **`admin123`**.
 
 | Role | Email | Password | Description |
 | :--- | :--- | :--- | :--- |
-| **ADMIN** | `admin@kicd.ac.ke` | `password123` | Full system administrator. Manages staff, departments, and configs. |
-| **HR_OFFICER** | `hr@kicd.ac.ke` | `password123` | Reviewer who evaluates and accepts/rejects applications. |
-| **STUDENT** | `student@gmail.com` | `password123` | Standard applicant who browses opportunities and tracks their status. |
+| **ADMIN** | `admin@kicd.ac.ke` | `admin123` | Full system administrator. Manages staff, departments, and configs. |
+| **HR_OFFICER** | `hr@kicd.ac.ke` | `admin123` | Reviewer who evaluates and accepts/rejects applications. |
+| **STUDENT** | `student@gmail.com` | `admin123` | Standard applicant who browses opportunities and tracks their status. |
 
 *You can also register a brand new student account via the public landing page interface.*
