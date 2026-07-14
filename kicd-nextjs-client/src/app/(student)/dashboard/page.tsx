@@ -1,42 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { api } from "@/lib/api";
+import useSWR from "swr";
+import { api, fetcher } from "@/lib/api";
 import { useAuth } from "@/components/AuthProvider";
 import { CenteredSpinner } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/ToastContext";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { ApplicantProfile, Application, Opportunity } from "@/types";
 
 export default function StudentDashboard() {
   const { user } = useAuth();
   const toast = useToast();
-  const [profile, setProfile] = useState<any>(null);
-  const [applications, setApplications] = useState<any[]>([]);
-  const [opportunities, setOpportunities] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [deleteAppId, setDeleteAppId] = useState<number | null>(null);
 
-  useEffect(() => {
-    async function loadDashboard() {
-      try {
-        const [profRes, appsRes, oppsRes] = await Promise.allSettled([
-          api.get("/api/profile/me"),
-          api.get("/api/applications/me"),
-          api.get("/api/opportunities?status=PUBLISHED", { auth: false })
-        ]);
+  const { data: profile, isLoading: loadingProfile } = useSWR<ApplicantProfile>("/api/profile/me", fetcher);
+  const { data: applicationsData, isLoading: loadingApps, mutate: mutateApps } = useSWR<Application[]>("/api/applications/me", fetcher);
+  const { data: opportunitiesData, isLoading: loadingOpps } = useSWR<Opportunity[]>("/api/opportunities?status=PUBLISHED", fetcher);
 
-        if (profRes.status === "fulfilled") setProfile(profRes.value);
-        if (appsRes.status === "fulfilled") setApplications(appsRes.value || []);
-        if (oppsRes.status === "fulfilled") setOpportunities(oppsRes.value || []);
-      } catch (err) {
-        console.error("Dashboard load error", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadDashboard();
-  }, []);
+  const applications = applicationsData || [];
+  const opportunities = opportunitiesData || [];
+  const loading = loadingProfile || loadingApps || loadingOpps;
 
   if (loading || !user) {
     return <CenteredSpinner message="Loading your dashboard…" />;
@@ -48,17 +33,23 @@ export default function StudentDashboard() {
   const approvedApps = applications.filter(a => a.status === 'APPROVED').length;
   const drafts = applications.filter(a => a.status === 'DRAFT').length;
 
-  let profileProgress = 25;
+  let profileProgress = 0;
   if (profile) {
     const requiredFields = [
       profile.firstName,
       profile.lastName,
+      profile.admissionNumber,
+      profile.department?.departmentId,
       profile.university,
       profile.courseName,
-      profile.department?.departmentId
+      profile.yearOfStudy,
+      profile.phoneNumber,
+      profile.gpa,
+      profile.gender,
+      profile.bio
     ];
     const filledCount = requiredFields.filter(f => f !== null && f !== undefined && String(f).trim() !== "").length;
-    profileProgress = 25 + (filledCount * 15); // Base 25% + 15% per field = 100%
+    profileProgress = Math.round((filledCount / requiredFields.length) * 100);
   }
 
   const formatDate = (dateStr?: string) => {
@@ -70,7 +61,7 @@ export default function StudentDashboard() {
     if (!deleteAppId) return;
     try {
       await api.delete(`/api/applications/${deleteAppId}`);
-      setApplications(prev => prev.filter(app => app.applicationId !== deleteAppId));
+      await mutateApps();
       toast.success("Application successfully deleted.");
     } catch (err: any) {
       toast.error(err.message || "Failed to cancel application");
@@ -201,7 +192,7 @@ export default function StudentDashboard() {
                         <span className="px-3 py-1 bg-surface-container-low text-on-surface-variant text-label-sm rounded-full">{opp.numberOfSlots} Open Positions</span>
                       </div>
                       <h4 className="font-headline-sm text-headline-sm text-primary mb-1">{opp.title}</h4>
-                      <p className="text-body-sm text-on-surface-variant mb-lg flex-1">{opp.departmentName || 'KICD'} • {opp.duration || 'N/A'}</p>
+                      <p className="text-body-sm text-on-surface-variant mb-lg flex-1">{opp.department?.name || 'KICD'} • {opp.duration || 'N/A'}</p>
                       <div className="flex gap-sm mt-auto">
                         {!existingApp ? (
                           <Link href={`/apply/${opp.opportunityId}`} className="flex-1 bg-primary text-on-primary py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity text-center flex items-center justify-center">Apply Now</Link>

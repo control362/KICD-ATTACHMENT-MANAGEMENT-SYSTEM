@@ -31,7 +31,12 @@ export default function ProfileEditPage() {
     courseName: "",
     admissionNumber: "",
     departmentId: "",
-    profilePhotoUrl: ""
+    profilePhotoUrl: "",
+    gpa: "",
+    gender: "",
+    bio: "",
+    yearOfStudy: "",
+    phoneNumber: ""
   });
 
   useEffect(() => {
@@ -53,7 +58,12 @@ export default function ProfileEditPage() {
             courseName: profRes.courseName || "",
             admissionNumber: profRes.admissionNumber || "",
             departmentId: profRes.department?.departmentId?.toString() || "",
-            profilePhotoUrl: profRes.profilePhotoUrl || ""
+            profilePhotoUrl: profRes.profilePhotoUrl || "",
+            gpa: profRes.gpa?.toString() || "",
+            gender: profRes.gender || "",
+            bio: profRes.bio || "",
+            yearOfStudy: profRes.yearOfStudy?.toString() || "",
+            phoneNumber: profRes.phoneNumber || ""
           });
         }
       } catch (err) {
@@ -78,14 +88,19 @@ export default function ProfileEditPage() {
         courseName: state.courseName,
         admissionNumber: state.admissionNumber || null,
         departmentId: state.departmentId ? parseInt(state.departmentId) : null,
-        profilePhotoUrl: state.profilePhotoUrl || null
+        profilePhotoUrl: state.profilePhotoUrl || null,
+        gpa: state.gpa ? parseFloat(state.gpa) : null,
+        gender: state.gender || null,
+        bio: state.bio || null,
+        yearOfStudy: state.yearOfStudy ? parseInt(state.yearOfStudy) : null,
+        phoneNumber: state.phoneNumber || null
       };
 
       await api.put(`/api/profile/${profile.studentId}`, payload);
-      toast({ title: "Profile updated successfully!" });
+      toast.success("Profile updated successfully!");
       router.push("/dashboard");
     } catch (err: any) {
-      toast({ title: "Error", description: err.message || "Failed to save profile. Please try again.", variant: "destructive" });
+      toast.error(err.message || "Failed to save profile. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -102,7 +117,7 @@ export default function ProfileEditPage() {
       const res = await api.post("/api/documents/upload", formData);
       setState(prev => ({ ...prev, profilePhotoUrl: res.fileUrl }));
     } catch (err: any) {
-      toast({ title: "Error", description: err.message || "Failed to upload photo.", variant: "destructive" });
+      toast.error(err.message || "Failed to upload photo.");
     } finally {
       setUploadingPhoto(false);
     }
@@ -113,11 +128,11 @@ export default function ProfileEditPage() {
     setChangingPwd(true);
     try {
       await api.post("/api/auth/change-password", pwdState);
-      toast({ title: "Password changed successfully!" });
+      toast.success("Password changed successfully!");
       setPasswordModalOpen(false);
       setPwdState({ currentPassword: "", newPassword: "" });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message || "Failed to change password.", variant: "destructive" });
+      toast.error(err.message || "Failed to change password.");
     } finally {
       setChangingPwd(false);
     }
@@ -245,13 +260,80 @@ export default function ProfileEditPage() {
               </div>
 
               <div className="flex flex-col gap-xs">
-                <label className="font-label-sm text-label-sm text-text-secondary">Admission Number</label>
+                <label className="font-label-sm text-label-sm text-text-secondary">Admission Number *</label>
                 <input
+                  required
                   className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200"
                   type="text"
                   value={state.admissionNumber}
                   onChange={e => setState({ ...state, admissionNumber: e.target.value })}
                 />
+              </div>
+
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Phone Number *</label>
+                <input
+                  required
+                  className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200"
+                  type="text"
+                  value={state.phoneNumber}
+                  onChange={e => setState({ ...state, phoneNumber: e.target.value })}
+                />
+              </div>
+
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Year of Study *</label>
+                <input
+                  required
+                  className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200"
+                  type="number"
+                  min="1"
+                  max="7"
+                  value={state.yearOfStudy}
+                  onChange={e => setState({ ...state, yearOfStudy: e.target.value })}
+                />
+              </div>
+
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Current GPA *</label>
+                <input
+                  required
+                  className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="5"
+                  value={state.gpa}
+                  onChange={e => setState({ ...state, gpa: e.target.value })}
+                />
+              </div>
+
+              <div className="flex flex-col gap-xs md:col-span-2">
+                <label className="font-label-sm text-label-sm text-text-secondary">Gender *</label>
+                <select
+                  required
+                  className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200"
+                  value={state.gender}
+                  onChange={e => setState({ ...state, gender: e.target.value })}
+                >
+                  <option value="" disabled>Select Gender</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                  <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-xs md:col-span-2">
+                <label className="font-label-sm text-label-sm text-text-secondary">Bio *</label>
+                <textarea
+                  required
+                  rows={4}
+                  className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200"
+                  value={state.bio}
+                  onChange={e => setState({ ...state, bio: e.target.value })}
+                  placeholder="Tell us a little bit about yourself..."
+                ></textarea>
               </div>
 
               <div className="flex flex-col gap-xs md:col-span-2 mt-sm">

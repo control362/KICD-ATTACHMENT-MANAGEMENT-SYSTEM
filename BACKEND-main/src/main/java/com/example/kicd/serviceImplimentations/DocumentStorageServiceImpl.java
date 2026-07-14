@@ -51,7 +51,7 @@ public class DocumentStorageServiceImpl implements DocumentStorageService {
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            return fileName;
+            return "/api/documents/" + fileName;
         } catch (IOException ex) {
             throw new RuntimeException("Could not store file " + originalFileName + ". Please try again!", ex);
         }
@@ -68,7 +68,7 @@ public class DocumentStorageServiceImpl implements DocumentStorageService {
                 throw new ResourceNotFoundException("File not found " + fileName);
             }
         } catch (MalformedURLException ex) {
-            throw new ResourceNotFoundException("File not found " + fileName + ": " + ex.getMessage());
+            throw new ResourceNotFoundException("File not found " + fileName, ex);
         }
     }
 }

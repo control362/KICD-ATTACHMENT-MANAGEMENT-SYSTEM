@@ -24,8 +24,13 @@ export default function NewOpportunity() {
     status: "DRAFT",
     applicationDeadline: "",
     requirements: "",
-    responsibilities: "",
-    vacancies: 1
+    benefits: "",
+    vacancies: 1,
+    duration: "",
+    location: "",
+    workArrangement: "",
+    startDate: "",
+    endDate: ""
   });
 
   useEffect(() => {
@@ -133,8 +138,41 @@ export default function NewOpportunity() {
               <textarea rows={4} value={formData.requirements} onChange={e => setFormData({...formData, requirements: e.target.value})} className="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y" placeholder="List requirements (e.g. continuing student, relevant coursework...)" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Responsibilities</label>
-              <textarea rows={4} value={formData.responsibilities} onChange={e => setFormData({...formData, responsibilities: e.target.value})} className="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y" placeholder="List daily tasks..." />
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Benefits / What you'll learn</label>
+              <textarea rows={4} value={formData.benefits} onChange={e => setFormData({...formData, benefits: e.target.value})} className="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y" placeholder="List benefits or learning outcomes..." />
+            </div>
+          </div>
+        </div>
+
+        {/* Logistics */}
+        <div className="pt-4">
+          <h2 className="text-xl font-bold text-primary mb-4 border-b border-surface-container-highest pb-2">Logistics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Location</label>
+              <input type="text" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="e.g. Nairobi HQs" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Work Arrangement</label>
+              <select value={formData.workArrangement} onChange={e => setFormData({...formData, workArrangement: e.target.value})} className="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none cursor-pointer">
+                <option value="">Select Work Arrangement...</option>
+                <option value="ON-SITE">On-Site</option>
+                <option value="REMOTE">Remote</option>
+                <option value="HYBRID">Hybrid</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Duration</label>
+              <input type="text" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} className="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="e.g. 3 Months" />
+            </div>
+            <div className="hidden md:block"></div>
+            <div>
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Start Date</label>
+              <input type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">End Date</label>
+              <input type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" />
             </div>
           </div>
         </div>

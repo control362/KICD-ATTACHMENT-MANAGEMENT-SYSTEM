@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -35,6 +36,8 @@ public class ApplicantProfileDTO {
     private String courseName;
 
     private Integer yearOfStudy;
+
+    private BigDecimal gpa;
 
     private String bio;
     private String profilePhotoUrl;

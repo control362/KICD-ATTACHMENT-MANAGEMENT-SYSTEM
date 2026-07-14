@@ -12,7 +12,14 @@ export interface User {
 }
 
 export function saveSession(authResponse: { accessToken: string; userId: number; email: string; role: string }) {
-  Cookies.set(TOKEN_KEY, authResponse.accessToken, { expires: 7 }); // expires in 7 days
+  const isProduction = process.env.NODE_ENV === 'production';
+  const cookieOptions: Cookies.CookieAttributes = { 
+    expires: 7, 
+    sameSite: 'strict', 
+    secure: isProduction 
+  };
+  
+  Cookies.set(TOKEN_KEY, authResponse.accessToken, cookieOptions);
   Cookies.set(
     USER_KEY,
     JSON.stringify({
@@ -20,7 +27,7 @@ export function saveSession(authResponse: { accessToken: string; userId: number;
       email: authResponse.email,
       role: authResponse.role,
     }),
-    { expires: 7 }
+    cookieOptions
   );
 }
 

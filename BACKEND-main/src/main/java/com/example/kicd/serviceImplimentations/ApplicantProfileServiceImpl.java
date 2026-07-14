@@ -70,6 +70,7 @@ public class ApplicantProfileServiceImpl implements ApplicantProfileService {
                 .gender(dto.getGender())
                 .courseName(dto.getCourseName())
                 .yearOfStudy(dto.getYearOfStudy())
+                .gpa(dto.getGpa())
                 .bio(dto.getBio())
                 .profilePhotoUrl(dto.getProfilePhotoUrl())
                 .build();
@@ -126,9 +127,18 @@ public class ApplicantProfileServiceImpl implements ApplicantProfileService {
         applicantProfile.setGender(dto.getGender());
         applicantProfile.setCourseName(dto.getCourseName());
         applicantProfile.setYearOfStudy(dto.getYearOfStudy());
+        applicantProfile.setGpa(dto.getGpa());
         applicantProfile.setBio(dto.getBio());
         applicantProfile.setProfilePhotoUrl(dto.getProfilePhotoUrl());
-        applicantProfile.setAdmissionNumber(dto.getAdmissionNumber());
+        if (dto.getAdmissionNumber() != null && !dto.getAdmissionNumber().trim().isEmpty()) {
+            ApplicantProfile existingWithAdmissionNo = ApplicantProfileRepository.findByAdmissionNumber(dto.getAdmissionNumber().trim()).orElse(null);
+            if (existingWithAdmissionNo != null && !existingWithAdmissionNo.getStudentId().equals(applicantProfile.getStudentId())) {
+                throw new ConflictException("The Admission Number '" + dto.getAdmissionNumber() + "' is already registered to another account.");
+            }
+            applicantProfile.setAdmissionNumber(dto.getAdmissionNumber().trim());
+        } else {
+            applicantProfile.setAdmissionNumber(null);
+        }
 
         if (applicantProfile.getUser() != null) {
             applicantProfile.setEmail(applicantProfile.getUser().getEmail());
@@ -162,12 +172,16 @@ public class ApplicantProfileServiceImpl implements ApplicantProfileService {
     }
 
     private boolean isProfileComplete(ApplicantProfile student) {
-        return student.getFirstName() != null
-                && student.getLastName() != null
-                && student.getAdmissionNumber() != null
+        return student.getFirstName() != null && !student.getFirstName().trim().isEmpty()
+                && student.getLastName() != null && !student.getLastName().trim().isEmpty()
+                && student.getAdmissionNumber() != null && !student.getAdmissionNumber().trim().isEmpty()
                 && student.getDepartment() != null
-                && student.getUniversity() != null
-                && student.getCourseName() != null
-                && student.getYearOfStudy() != null;
+                && student.getUniversity() != null && !student.getUniversity().trim().isEmpty()
+                && student.getCourseName() != null && !student.getCourseName().trim().isEmpty()
+                && student.getYearOfStudy() != null
+                && student.getPhoneNumber() != null && !student.getPhoneNumber().trim().isEmpty()
+                && student.getGpa() != null
+                && student.getGender() != null
+                && student.getBio() != null && !student.getBio().trim().isEmpty();
     }
 }

@@ -63,10 +63,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest req) {
+        String detailMessage = "This operation violates a data constraint (e.g. a duplicate value).";
+        Throwable mostSpecificCause = ex.getMostSpecificCause();
+        if (mostSpecificCause != null && mostSpecificCause.getMessage() != null) {
+            detailMessage = "Data Constraint Error: " + mostSpecificCause.getMessage();
+        }
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiError.of(409, "Conflict",
-                        "This operation violates a data constraint (e.g. a duplicate value).",
-                        req.getRequestURI()));
+                .body(ApiError.of(409, "Conflict", detailMessage, req.getRequestURI()));
     }
 
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})

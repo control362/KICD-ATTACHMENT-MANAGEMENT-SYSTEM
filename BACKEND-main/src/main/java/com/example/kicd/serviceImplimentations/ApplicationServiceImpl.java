@@ -104,6 +104,15 @@ public class ApplicationServiceImpl implements ApplicationService {
     public Application submitApplication(Long applicationId, String resumeUrl, String idDocumentUrl) {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
+
+        if (!application.getStudent().getProfileCompleted()) {
+            throw new IllegalStateException("You cannot submit an application with an incomplete profile. Please complete your profile first.");
+        }
+
+        if (resumeUrl == null || resumeUrl.trim().isEmpty() || idDocumentUrl == null || idDocumentUrl.trim().isEmpty()) {
+            throw new IllegalStateException("Both ID document and CV are mandatory to submit the application.");
+        }
+
         application.setStatus("PENDING");
         application.setResumeUrl(resumeUrl);
         application.setIdDocumentUrl(idDocumentUrl);

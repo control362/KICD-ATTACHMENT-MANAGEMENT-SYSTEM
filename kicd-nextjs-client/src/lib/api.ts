@@ -10,11 +10,11 @@ export class ApiError extends Error {
   constructor(status: number, body: any) {
     let msg = body?.message || "Something went wrong. Please try again.";
 
-    // Parse Spring Boot validation errors
-    if (status === 400 && body?.errors && Array.isArray(body.errors)) {
-      const messages = body.errors.map((e: any) => e.defaultMessage).filter(Boolean);
+    // Parse Spring Boot validation errors (which are returned as a map in fieldErrors)
+    if (status === 400 && body?.fieldErrors && typeof body.fieldErrors === 'object') {
+      const messages = Object.entries(body.fieldErrors).map(([field, error]) => `${field}: ${error}`);
       if (messages.length > 0) {
-        msg = "Validation Error: " + messages.join(", ");
+        msg = "Validation Error: " + messages.join(" | ");
       }
     }
 
@@ -101,3 +101,18 @@ export const api = {
   put: <T = any>(path: string, body?: any, opts?: RequestOptions) => request<T>(path, { ...opts, method: "PUT", body }),
   delete: <T = any>(path: string, opts?: RequestOptions) => request<T>(path, { ...opts, method: "DELETE" }),
 };
+
+export const fetcher = (url: string) => api.get(url);
+
+/**
+ * Normalizes document and image URLs.
+ * If the URL is already an absolute HTTP/HTTPS URL (like Cloudinary), it returns it as-is.
+ * Otherwise, it assumes it's a legacy local path and prepends the backend API base URL.
+ */
+export function getFileUrl(url: string | null | undefined): string {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+}

@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface ApplicantProfileRepository extends JpaRepository<ApplicantProfile, Long> {
 
     Optional<ApplicantProfile> findByUser_UserId(Long userId);
+    Optional<ApplicantProfile> findByAdmissionNumber(String admissionNumber);
 }

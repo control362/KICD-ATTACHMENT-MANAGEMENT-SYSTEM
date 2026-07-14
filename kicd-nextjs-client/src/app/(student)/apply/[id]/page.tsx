@@ -29,9 +29,18 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
     lastName: "",
     university: "",
     courseName: "",
+    admissionNumber: "",
+    departmentId: "",
+    yearOfStudy: "",
+    phoneNumber: "",
+    gpa: "",
+    gender: "",
+    bio: "",
     idDocumentPath: "",
     cvDocumentPath: "",
   });
+
+  const [departments, setDepartments] = useState<any[]>([]);
 
   const [uploadingId, setUploadingId] = useState(false);
   const [uploadingCv, setUploadingCv] = useState(false);
@@ -52,21 +61,31 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
       initialized.current = true;
 
       try {
-        const opp = await api.get(`/api/opportunities/${opportunityId}`, { auth: false });
+        const [opp, app, prof, deptRes] = await Promise.all([
+          api.get(`/api/opportunities/${opportunityId}`, { auth: false }),
+          api.post(`/api/applications/opportunity/${opportunityId}`),
+          api.get("/api/profile/me"),
+          api.get("/api/departments")
+        ]);
+
         setOpportunity(opp);
-
-        const app = await api.post(`/api/applications/opportunity/${opportunityId}`);
         setApplication(app);
-
-        const prof = await api.get("/api/profile/me");
         setProfile(prof);
+        setDepartments(deptRes || []);
 
         setState({
           firstName: prof?.firstName || "",
           lastName: prof?.lastName || "",
           university: prof?.university || "",
           courseName: prof?.courseName || "",
-          idDocumentPath: app?.resumeUrl ? "" : "", // We are re-uploading or not using previous drafts correctly yet, simplified
+          admissionNumber: prof?.admissionNumber || "",
+          departmentId: prof?.department?.departmentId?.toString() || "",
+          yearOfStudy: prof?.yearOfStudy?.toString() || "",
+          phoneNumber: prof?.phoneNumber || "",
+          gpa: prof?.gpa?.toString() || "",
+          gender: prof?.gender || "",
+          bio: prof?.bio || "",
+          idDocumentPath: app?.resumeUrl ? "" : "", 
           cvDocumentPath: "",
         });
 
@@ -89,8 +108,8 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
   const handleNext = () => {
     // Validation for step 0
     if (step === 0) {
-      if (!state.firstName || !state.lastName || !state.university || !state.courseName) {
-        toast.error("Please fill in all required fields.");
+      if (!state.firstName || !state.lastName || !state.university || !state.courseName || !state.admissionNumber || !state.departmentId || !state.yearOfStudy || !state.phoneNumber || !state.gpa || !state.gender || !state.bio) {
+        toast.error("Please fill in all required profile details.");
         return;
       }
     }
@@ -117,12 +136,15 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
         body: formData
       });
 
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.message || "Upload failed");
+      }
 
       const data = await res.json();
       setState(s => ({ ...s, [key]: data.fileUrl }));
-    } catch (err) {
-      toast.error("Upload failed. Please try again.");
+    } catch (err: any) {
+      toast.error(err.message || "Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -136,9 +158,16 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
         lastName: state.lastName,
         university: state.university,
         courseName: state.courseName,
-        admissionNumber: profile.admissionNumber || "",
-        departmentId: profile.department?.departmentId || null,
+        admissionNumber: state.admissionNumber || null,
+        departmentId: state.departmentId ? parseInt(state.departmentId) : null,
+        profilePhotoUrl: profile?.profilePhotoUrl || null,
+        gpa: state.gpa ? parseFloat(state.gpa) : null,
+        gender: state.gender || null,
+        bio: state.bio || null,
+        yearOfStudy: state.yearOfStudy ? parseInt(state.yearOfStudy) : null,
+        phoneNumber: state.phoneNumber || null
       };
+
       await api.put(`/api/profile/${profile.studentId}`, profileDto);
 
       await api.put(`/api/applications/${application.applicationId}/submit`, {
@@ -207,12 +236,12 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
       </div>
       
       {/* Form Container */}
-      <div className="bg-white border border-outline-variant rounded-2xl p-6 md:p-10 shadow-sm">
+      <form onSubmit={e => { e.preventDefault(); handleNext(); }} className="bg-white border border-outline-variant rounded-2xl p-6 md:p-10 shadow-sm">
         <h2 className="text-2xl font-bold text-primary mb-8 border-b border-surface-container-highest pb-4 tracking-tight">{STEPS[step]}</h2>
         
         {step === 0 && (
           <div className="space-y-6">
-            <p className="text-sm text-on-surface-variant mb-4">Please verify or fill in your essential profile details. This information will be saved to your profile.</p>
+            <p className="text-sm text-on-surface-variant mb-4">Please verify or fill in your essential profile details. This information will be saved to your profile when you submit the application.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-on-surface-variant mb-2">First name</label>
@@ -232,6 +261,49 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
                 <label className="block text-sm font-semibold text-on-surface-variant mb-2">Course name</label>
                 <input required type="text" value={state.courseName} onChange={e => setState({...state, courseName: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
               </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Admission Number</label>
+                <input required type="text" value={state.admissionNumber} onChange={e => setState({...state, admissionNumber: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Target Department</label>
+                <select required value={state.departmentId} onChange={e => setState({...state, departmentId: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant">
+                  <option value="" disabled>Select Department</option>
+                  {departments.map(d => <option key={d.departmentId} value={d.departmentId}>{d.name}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Year of Study</label>
+                <input required type="number" min="1" max="7" value={state.yearOfStudy} onChange={e => setState({...state, yearOfStudy: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Phone Number</label>
+                <input required type="text" value={state.phoneNumber} onChange={e => setState({...state, phoneNumber: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Current GPA</label>
+                <input required type="number" step="0.01" min="0" max="5" value={state.gpa} onChange={e => setState({...state, gpa: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Gender</label>
+                <select required value={state.gender} onChange={e => setState({...state, gender: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant">
+                  <option value="" disabled>Select Gender</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                  <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Bio</label>
+              <textarea required rows={3} value={state.bio} onChange={e => setState({...state, bio: e.target.value})} placeholder="Tell us a little bit about yourself..." className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant"></textarea>
             </div>
           </div>
         )}
@@ -304,7 +376,7 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
           </div>
           
           {step < STEPS.length - 1 ? (
-            <button onClick={handleNext} type="button" className="bg-primary text-white font-semibold text-base px-6 py-3.5 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+            <button onClick={step === 0 ? undefined : handleNext} type={step === 0 ? "submit" : "button"} className="bg-primary text-white font-semibold text-base px-6 py-3.5 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
               Next Step <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
             </button>
           ) : (
@@ -314,7 +386,7 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
           )}
         </div>
 
-      </div>
+      </form>
       
       <ConfirmModal
         isOpen={showCancelModal}

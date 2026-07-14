@@ -57,7 +57,7 @@ export default function LoginPage() {
           <span className="material-symbols-outlined text-3xl">school</span>
         </div>
         <h1 className="text-3xl font-bold text-on-surface mb-2 tracking-tight">Welcome Back</h1>
-        <p className="text-on-surface-variant">Sign in to the KICD Attachment System</p>
+        <p className="text-on-surface-variant">Sign in</p>
       </div>
       
       <div className="glass-card rounded-2xl border border-outline-variant p-8 sm:p-10 overflow-hidden relative shadow-lg bg-white/95 backdrop-blur">

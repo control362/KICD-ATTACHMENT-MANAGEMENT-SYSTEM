@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, ReactNode } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { GlobalNavBar } from "@/components/GlobalNavBar";
@@ -8,6 +8,42 @@ import { useAuth } from "@/components/AuthProvider";
 import { useRouter } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { useToast } from "@/components/ui/ToastContext";
+
+function FadeInSection({ children, delay = 0 }: { children: ReactNode, delay?: number }) {
+  const [isVisible, setVisible] = useState(false);
+  const domRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const currentRef = domRef.current;
+    if (!currentRef) return;
+    
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(currentRef);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    observer.observe(currentRef);
+    return () => {
+      if (currentRef) observer.unobserve(currentRef);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={domRef}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={`transition-all duration-700 ease-out transform ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
 
 function SkeletonCard() {
   return (
@@ -33,6 +69,9 @@ export default function LandingPage() {
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  
+  const heroImages = ["/hero-img.png", "/hero-img-2.png", "/hero-img-3.png"];
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
 
   useEffect(() => {
     async function loadOpps() {
@@ -47,6 +86,13 @@ export default function LandingPage() {
       }
     }
     loadOpps();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeroIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleApply = (oppId: number, deptId: number) => {
@@ -72,12 +118,15 @@ export default function LandingPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative w-full h-[600px] flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 z-0">
-            <img 
-              alt="KICD Reception Area" 
-              className="w-full h-full object-cover object-center" 
-              src="/hero-img.png" 
-            />
+          <div className="absolute inset-0 z-0 bg-black">
+            {heroImages.map((src, idx) => (
+              <img 
+                key={src}
+                alt={`KICD Reception Area ${idx + 1}`} 
+                className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ease-in-out ${idx === currentHeroIndex ? 'opacity-100' : 'opacity-0'}`} 
+                src={src} 
+              />
+            ))}
             <div className="absolute inset-0 hero-gradient"></div>
           </div>
           <div className="relative z-10 text-center px-gutter flex flex-col items-center gap-lg" style={{ width: "100%", maxWidth: "900px", margin: "0 auto" }}>
@@ -89,21 +138,21 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-md" style={{ width: "100%", justifyContent: "center" }}>
               {user ? (
                 <>
-                  <button onClick={() => document.getElementById('opportunities')?.scrollIntoView({behavior: 'smooth'})} className="px-xl py-md rounded-lg font-label-md text-label-md bg-secondary-container text-on-secondary-container hover:bg-secondary-fixed transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-xs">
+                  <button onClick={() => document.getElementById('opportunities')?.scrollIntoView({behavior: 'smooth'})} className="px-xl py-md rounded-lg font-label-md text-label-md bg-secondary-container text-on-secondary-container hover:bg-secondary-fixed transition-all duration-200 hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:scale-95 flex items-center justify-center gap-xs">
                     <span>Proceed with Applications</span>
                     <span className="material-symbols-outlined text-sm">arrow_downward</span>
                   </button>
-                  <Link href="/dashboard" className="px-xl py-md rounded-lg font-label-md text-label-md border-2 border-on-primary text-on-primary hover:bg-on-primary hover:text-primary transition-all duration-200 text-center">
+                  <Link href="/dashboard" className="px-xl py-md rounded-lg font-label-md text-label-md border-2 border-on-primary text-on-primary hover:bg-on-primary hover:text-primary transition-all duration-200 hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:scale-95 text-center">
                     Go to Dashboard
                   </Link>
                 </>
               ) : (
                 <>
-                  <Link href="/register" className="px-xl py-md rounded-lg font-label-md text-label-md bg-secondary-container text-on-secondary-container hover:bg-secondary-fixed transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-xs">
+                  <Link href="/register" className="px-xl py-md rounded-lg font-label-md text-label-md bg-secondary-container text-on-secondary-container hover:bg-secondary-fixed transition-all duration-200 hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:scale-95 flex items-center justify-center gap-xs">
                     <span>Apply for Attachment</span>
                     <span className="material-symbols-outlined text-sm">arrow_forward</span>
                   </Link>
-                  <button onClick={() => document.getElementById('opportunities')?.scrollIntoView({behavior: 'smooth'})} className="px-xl py-md rounded-lg font-label-md text-label-md border-2 border-on-primary text-on-primary hover:bg-on-primary hover:text-primary transition-all duration-200 text-center">
+                  <button onClick={() => document.getElementById('opportunities')?.scrollIntoView({behavior: 'smooth'})} className="px-xl py-md rounded-lg font-label-md text-label-md border-2 border-on-primary text-on-primary hover:bg-on-primary hover:text-primary transition-all duration-200 hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:scale-95 text-center">
                     View Openings
                   </button>
                 </>
@@ -119,33 +168,39 @@ export default function LandingPage() {
             <p className="font-body-md text-body-md text-on-surface-variant" style={{ width: "100%", maxWidth: "700px" }}>Our attachment program is designed to provide practical skills and deep insights into the educational sector.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
-            <div className="glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col items-start gap-md border border-border-light">
-              <div className="w-12 h-12 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
-                <span className="material-symbols-outlined text-2xl">trending_up</span>
+            <FadeInSection delay={0}>
+              <div className="glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col items-start gap-md border border-border-light">
+                <div className="w-12 h-12 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-2xl">trending_up</span>
+                </div>
+                <div>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Professional Growth</h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">Gain invaluable hands-on experience working alongside industry experts in curriculum design and educational technology.</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Professional Growth</h3>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">Gain invaluable hands-on experience working alongside industry experts in curriculum design and educational technology.</p>
+            </FadeInSection>
+            <FadeInSection delay={150}>
+              <div className="glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col items-start gap-md border border-border-light">
+                <div className="w-12 h-12 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary">
+                  <span className="material-symbols-outlined text-2xl">groups</span>
+                </div>
+                <div>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Expert Mentorship</h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">Receive guidance and structured feedback from seasoned professionals dedicated to nurturing new talent in the field.</p>
+                </div>
               </div>
-            </div>
-            <div className="glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col items-start gap-md border border-border-light">
-              <div className="w-12 h-12 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary">
-                <span className="material-symbols-outlined text-2xl">groups</span>
+            </FadeInSection>
+            <FadeInSection delay={300}>
+              <div className="glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col items-start gap-md border border-border-light">
+                <div className="w-12 h-12 rounded-lg bg-tertiary-fixed flex items-center justify-center text-tertiary">
+                  <span className="material-symbols-outlined text-2xl">lightbulb</span>
+                </div>
+                <div>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Innovation in Education</h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">Contribute to forward-thinking projects that directly impact the national education ecosystem and learner outcomes.</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Expert Mentorship</h3>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">Receive guidance and structured feedback from seasoned professionals dedicated to nurturing new talent in the field.</p>
-              </div>
-            </div>
-            <div className="glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col items-start gap-md border border-border-light">
-              <div className="w-12 h-12 rounded-lg bg-tertiary-fixed flex items-center justify-center text-tertiary">
-                <span className="material-symbols-outlined text-2xl">lightbulb</span>
-              </div>
-              <div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Innovation in Education</h3>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">Contribute to forward-thinking projects that directly impact the national education ecosystem and learner outcomes.</p>
-              </div>
-            </div>
+            </FadeInSection>
           </div>
         </section>
 
@@ -190,25 +245,27 @@ export default function LandingPage() {
               const colorTheme = iconColors[idx % 3];
 
               return (
-                <div key={opp.opportunityId} className="bg-surface rounded-xl border border-border-light p-md flex flex-col hover:bg-surface-subtle transition-colors duration-200 shadow-sm hover:shadow-md">
-                  <div className="flex justify-between items-start mb-md">
-                    <div className={`w-10 h-10 rounded flex items-center justify-center ${colorTheme.bg} ${colorTheme.text}`}>
-                      <span className="material-symbols-outlined">{colorTheme.icon}</span>
+                <FadeInSection key={opp.opportunityId} delay={idx * 100}>
+                  <div className="bg-surface rounded-xl border border-border-light p-md flex flex-col hover:bg-surface-subtle transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
+                    <div className="flex justify-between items-start mb-md">
+                      <div className={`w-10 h-10 rounded flex items-center justify-center ${colorTheme.bg} ${colorTheme.text}`}>
+                        <span className="material-symbols-outlined">{colorTheme.icon}</span>
+                      </div>
+                      <span className="px-sm py-xs bg-success/10 text-success rounded-full font-label-sm text-label-sm">{opp.numberOfSlots} Positions</span>
                     </div>
-                    <span className="px-sm py-xs bg-success/10 text-success rounded-full font-label-sm text-label-sm">{opp.numberOfSlots} Positions</span>
+                    <span className="text-xs font-bold uppercase tracking-wider mb-2 text-text-secondary">{opp.departmentName}</span>
+                    <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">{opp.title}</h3>
+                    <p className="font-body-sm text-body-sm text-on-surface-variant mb-lg flex-grow line-clamp-2">{opp.description}</p>
+                    <div className="flex justify-between items-center pt-md border-t border-border-light">
+                      <span className="font-label-sm text-label-sm text-text-secondary flex items-center gap-xs">
+                        <span className="material-symbols-outlined text-sm">schedule</span> Closes: {new Date(opp.applicationDeadline).toLocaleDateString()}
+                      </span>
+                      <button onClick={() => handleApply(opp.opportunityId, opp.departmentId)} className="px-md py-sm rounded-lg bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-all duration-200 hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-95">
+                        Apply Now
+                      </button>
+                    </div>
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-wider mb-2 text-text-secondary">{opp.departmentName}</span>
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">{opp.title}</h3>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant mb-lg flex-grow line-clamp-2">{opp.description}</p>
-                  <div className="flex justify-between items-center pt-md border-t border-border-light">
-                    <span className="font-label-sm text-label-sm text-text-secondary flex items-center gap-xs">
-                      <span className="material-symbols-outlined text-sm">schedule</span> Closes: {new Date(opp.applicationDeadline).toLocaleDateString()}
-                    </span>
-                    <button onClick={() => handleApply(opp.opportunityId, opp.departmentId)} className="px-md py-sm rounded-lg bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-colors">
-                      Apply Now
-                    </button>
-                  </div>
-                </div>
+                </FadeInSection>
               );
             })}
           </div>

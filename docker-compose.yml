@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kicd_db
+      POSTGRES_USER: kicd_admin
+      POSTGRES_PASSWORD: admin_password_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kicd_admin -d kicd_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: 
+      context: ./BACKEND-main
+    environment:
+      - DB_APP_USER=kicd_app
+      - DB_APP_PASSWORD=app_password_123
+      - DB_ADMIN_USER=kicd_admin
+      - DB_ADMIN_PASSWORD=admin_password_123
+      - DB_URL=jdbc:postgresql://db:5432/kicd_db
+      - JWT_SECRET=bXlfc3VwZXJfc2VjcmV0X2tleV90aGF0X211c3RfYmVfbG9uZ2VyX3RoYW5fMjU2X2JpdHM=
+    ports:
+      - "8081:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./kicd-nextjs-client
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  pgdata:

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { api, ApiError } from "@/lib/api";
+import { api, ApiError, getFileUrl } from "@/lib/api";
 import { CenteredSpinner } from "@/components/ui/Spinner";
 import { API_BASE_URL } from "@/lib/config";
 import { useToast } from "@/components/ui/ToastContext";
@@ -159,7 +159,7 @@ export default function ReviewDetail({ params }: { params: Promise<{ id: string 
                         <p className="text-xs text-on-surface-variant">Applicant CV</p>
                       </div>
                     </div>
-                    <a href={`${API_BASE_URL}${app.resumeUrl}`} target="_blank" rel="noreferrer" className="px-4 py-2 bg-primary-container text-white text-sm font-bold rounded-lg hover:bg-primary transition-colors flex items-center gap-2 shadow-sm">
+                    <a href={getFileUrl(app.resumeUrl)} target="_blank" rel="noreferrer" className="px-4 py-2 bg-primary-container text-white text-sm font-bold rounded-lg hover:bg-primary transition-colors flex items-center gap-2 shadow-sm">
                       <span className="material-symbols-outlined text-[18px]">visibility</span> View Document
                     </a>
                   </div>
@@ -173,7 +173,7 @@ export default function ReviewDetail({ params }: { params: Promise<{ id: string 
                         <p className="text-xs text-on-surface-variant">National / Student ID</p>
                       </div>
                     </div>
-                    <a href={`${API_BASE_URL}${app.idDocumentUrl}`} target="_blank" rel="noreferrer" className="px-4 py-2 bg-primary-container text-white text-sm font-bold rounded-lg hover:bg-primary transition-colors flex items-center gap-2 shadow-sm">
+                    <a href={getFileUrl(app.idDocumentUrl)} target="_blank" rel="noreferrer" className="px-4 py-2 bg-primary-container text-white text-sm font-bold rounded-lg hover:bg-primary transition-colors flex items-center gap-2 shadow-sm">
                       <span className="material-symbols-outlined text-[18px]">visibility</span> View Document
                     </a>
                   </div>

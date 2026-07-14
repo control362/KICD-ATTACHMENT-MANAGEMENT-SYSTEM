@@ -29,14 +29,11 @@ public class DocumentController {
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal UserPrincipal principal) {
 
-        String fileName = documentStorageService.storeFile(file, principal.getUserId());
-
-        // Generate a URL for the uploaded file
-        String fileDownloadUri = "/api/documents/" + fileName;
+        String fileUrl = documentStorageService.storeFile(file, principal.getUserId());
 
         Map<String, String> response = new HashMap<>();
-        response.put("fileName", fileName);
-        response.put("fileUrl", fileDownloadUri);
+        response.put("fileName", file.getOriginalFilename());
+        response.put("fileUrl", fileUrl);
 
         return ResponseEntity.ok(response);
     }
