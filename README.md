@@ -1,76 +1,78 @@
 # KICD Attachment Management System
 
-This repository contains the complete KICD Attachment Management System, consisting of a Spring Boot backend and a modern Next.js frontend styled with TailwindCSS.
+This repository contains the complete KICD Attachment Management System, consisting of a Spring Boot backend and a strictly-typed Next.js frontend styled with TailwindCSS.
 
-## Prerequisites
+## Architecture Highlights
+- **Frontend**: Next.js (App Router), React, SWR Caching, Strict TypeScript.
+- **Backend**: Spring Boot 3, Java 21, Hibernate, JWT Authentication.
+- **Database**: PostgreSQL with Flyway Migrations.
+- **API Gateway**: Nginx Reverse Proxy with Rate Limiting (10 req/min on `/api/auth/login`).
+- **Orchestration**: Docker Compose for easy deployment.
 
-Before running the application, ensure you have the following installed:
-1. **Java Development Kit (JDK)**: Version 17 or higher.
+---
+
+## 🚀 Quick Start (Recommended: Docker)
+
+The easiest way to run the entire enterprise stack (PostgreSQL, Spring Boot, Next.js, and Nginx) is via Docker.
+
+### Prerequisites
+- Docker & Docker Compose installed.
+
+### Steps
+1. Clone the repository and navigate to the root directory.
+2. Build and start the containers in detached mode:
+   ```bash
+   docker compose up -d --build
+   ```
+3. The system is now live!
+   - **Frontend App**: `http://localhost`
+   - **Swagger API Docs**: `http://localhost:8081/swagger-ui.html`
+
+*Note: Flyway will automatically run database migrations and seed default data on startup.*
+
+---
+
+## 🛠️ Manual Development Setup
+
+If you prefer to run the components locally for development without Docker:
+
+### Prerequisites
+1. **Java Development Kit (JDK)**: Version 21.
 2. **PostgreSQL**: Version 12 or higher.
-3. **Node.js**: Version 18 or higher (for running the Next.js frontend).
-4. **Git**: For version control.
+3. **Node.js**: Version 18 or higher.
+
+### 1. Database Setup
+Create the database in PostgreSQL:
+```sql
+CREATE DATABASE kicd_db;
+```
+By default, the backend expects `postgres`/`admin123`. To override this, edit `BACKEND-main/src/main/resources/application.properties` or set environment variables (`DB_APP_USER`, `DB_APP_PASSWORD`).
+
+### 2. Run Backend (Spring Boot)
+```bash
+cd BACKEND-main
+./mvnw clean spring-boot:run
+```
+*Runs on `http://localhost:8081`*
+
+### 3. Run Frontend (Next.js)
+```bash
+cd kicd-nextjs-client
+npm install
+npm run dev
+```
+*Runs on `http://localhost:3000`*
 
 ---
 
-## 1. Database Setup
+## 🔐 Default Login Credentials
 
-The backend relies on PostgreSQL. You need to create a database and configure your credentials.
-
-1. Open your PostgreSQL terminal (e.g., `psql` or pgAdmin).
-2. Create the database used by the application:
-   ```sql
-   CREATE DATABASE kicd_db;
-   ```
-3. By default, the application connects with `postgres`/`admin123`. If your credentials differ, update them in:
-`BACKEND-main/src/main/resources/application.properties`
-
-*Note: The backend uses **Flyway** for migrations. Starting the backend will automatically set up the schema and seed default data.*
-
----
-
-## 2. Running the Backend (Spring Boot)
-
-1. Open your terminal and navigate to the backend directory:
-   ```bash
-   cd BACKEND-main
-   ```
-2. Run the application:
-   - **Windows**: `.\mvnw spring-boot:run`
-   - **macOS/Linux**: `./mvnw spring-boot:run`
-
-The backend runs on **`http://localhost:8081`** by default (configured in `application.properties`).
-
----
-
-## 3. Running the Frontend (Next.js)
-
-The frontend is a robust Next.js application built with App Router and Tailwind CSS.
-
-1. Open a **new** terminal window and navigate to the frontend directory:
-   ```bash
-   cd kicd-nextjs-client
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-The frontend runs on **`http://localhost:3000`**. Open this URL in your browser to access the system.
-
----
-
-## 4. Default Logins & System Roles
-
-The platform manages three distinct roles. To get you started immediately, the system automatically seeds the following default accounts (all passwords are `password123`):
+The database is automatically seeded with default accounts to get you started. All default passwords are **`password123`**.
 
 | Role | Email | Password | Description |
 | :--- | :--- | :--- | :--- |
-| **ADMIN** | `admin@kicd.ac.ke` | `password123` | Full system administrator: manages staff, departments, and system configs. |
+| **ADMIN** | `admin@kicd.ac.ke` | `password123` | Full system administrator. Manages staff, departments, and configs. |
 | **HR_OFFICER** | `hr@kicd.ac.ke` | `password123` | Reviewer who evaluates and accepts/rejects applications. |
-| **STUDENT** | `student@test.com` | `password123` | Applicant who browses opportunities and tracks their application status. |
+| **STUDENT** | `student@gmail.com` | `password123` | Standard applicant who browses opportunities and tracks their status. |
 
 *You can also register a brand new student account via the public landing page interface.*
