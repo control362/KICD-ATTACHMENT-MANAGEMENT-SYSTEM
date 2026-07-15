@@ -1,12 +1,16 @@
 import { GlobalNavBar } from "@/components/GlobalNavBar";
+import { StudentSidebar } from "@/components/StudentSidebar";
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       <GlobalNavBar />
-      <main className="flex-1 w-full mx-auto">
-        {children}
-      </main>
+      <div className="flex w-full flex-1 overflow-hidden">
+        <StudentSidebar />
+        <main className="flex-1 overflow-y-auto w-full">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

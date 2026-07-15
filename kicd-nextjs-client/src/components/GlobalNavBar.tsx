@@ -34,13 +34,6 @@ export function GlobalNavBar() {
         {/* Middle: Navigation Links */}
         <nav className="hidden lg:flex items-center gap-8">
           {!isLoggedIn && navItem("/", "Home")}
-          {isLoggedIn && isStudent && (
-            <>
-              {navItem("/", "Home")}
-              {navItem("/dashboard", "Dashboard")}
-              {navItem("/profile", "Profile")}
-            </>
-          )}
           {isLoggedIn && isStaff && (
             <>
               {navItem("/reviewer/dashboard", "Dashboard")}
@@ -58,16 +51,27 @@ export function GlobalNavBar() {
         <div className="flex items-center gap-sm md:gap-md">
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
-              <div className="hidden md:flex flex-col items-end">
-                <span className="text-sm font-bold text-primary leading-tight">{user.email}</span>
-                <span className="text-xs text-text-secondary uppercase tracking-wider">{user.role.replace('_', ' ')}</span>
-              </div>
-              <button 
-                onClick={logout} 
-                className="px-5 py-2 rounded-lg font-label-md text-label-md bg-error-container text-on-error-container hover:bg-error hover:text-white transition-all duration-200 shadow-sm hover:shadow"
-              >
-                Logout
-              </button>
+              {isStudent ? (
+                <Link href="/profile" className="relative group flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors">
+                  <span className="material-symbols-outlined text-primary text-[24px]">person</span>
+                  <div className="absolute top-full right-0 mt-2 whitespace-nowrap bg-surface-container-high border border-border-light text-on-surface px-3 py-1.5 rounded shadow-lg text-sm font-medium opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
+                    {user.email}
+                  </div>
+                </Link>
+              ) : (
+                <>
+                  <div className="hidden md:flex flex-col items-end">
+                    <span className="text-sm font-bold text-primary leading-tight">{user.email}</span>
+                    <span className="text-xs text-text-secondary uppercase tracking-wider">{user.role.replace('_', ' ')}</span>
+                  </div>
+                  <button 
+                    onClick={logout} 
+                    className="px-5 py-2 rounded-lg font-label-md text-label-md bg-error-container text-on-error-container hover:bg-error hover:text-white transition-all duration-200 shadow-sm hover:shadow"
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
           ) : (
             <div className="flex items-center gap-3">
@@ -85,13 +89,6 @@ export function GlobalNavBar() {
       {/* Mobile Navigation */}
       <nav className="lg:hidden w-full bg-surface-subtle border-t border-border-light flex overflow-x-auto px-4 py-2 gap-4">
         {!isLoggedIn && navItem("/", "Home")}
-        {isLoggedIn && isStudent && (
-          <>
-            {navItem("/", "Home")}
-            {navItem("/dashboard", "Dashboard")}
-            {navItem("/profile", "Profile")}
-          </>
-        )}
         {isLoggedIn && isStaff && (
           <>
             {navItem("/reviewer/dashboard", "Dashboard")}

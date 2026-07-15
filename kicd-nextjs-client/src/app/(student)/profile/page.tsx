@@ -54,6 +54,7 @@ export default function ProfilePage() {
             </div>
             
             <form onSubmit={handlePasswordChange} className="space-y-5" noValidate>
+              <input type="text" name="username" autoComplete="username" defaultValue={user.email} style={{ display: 'none' }} />
               <div>
                 <label className="block text-sm font-semibold text-on-surface-variant mb-2">Current password</label>
                 <input 
