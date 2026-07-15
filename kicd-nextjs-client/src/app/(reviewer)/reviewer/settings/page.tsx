@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { api } from "@/lib/api";
+import { api, getFileUrl } from "@/lib/api";
 import { useAuth } from "@/components/AuthProvider";
 import { CenteredSpinner } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/ToastContext";
@@ -125,7 +125,7 @@ export default function ReviewerSettingsPage() {
             
             <div className="relative mb-md group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
               {state.profilePhotoUrl ? (
-                <img src={`http://localhost:8081${state.profilePhotoUrl}`} alt="Profile" className="w-32 h-32 rounded-full object-cover border-4 border-surface shadow-sm" />
+                <img src={getFileUrl(state.profilePhotoUrl)} alt="Profile" className="w-32 h-32 rounded-full object-cover border-4 border-surface shadow-sm" />
               ) : (
                 <div className="w-32 h-32 rounded-full border-4 border-surface shadow-sm bg-primary-fixed flex items-center justify-center text-primary text-5xl font-bold">
                   {state.firstName ? state.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}

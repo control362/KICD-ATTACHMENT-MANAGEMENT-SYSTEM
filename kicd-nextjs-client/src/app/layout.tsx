@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 
 import { AuthProvider } from "@/components/AuthProvider";
 import { ToastProvider } from "@/components/ui/ToastContext";
+import { SidebarProvider } from "@/components/SidebarContext";
 
 export default function RootLayout({
   children,
@@ -37,7 +38,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-on-background">
         <ToastProvider>
           <AuthProvider>
-            {children}
+            <SidebarProvider>
+              {children}
+            </SidebarProvider>
           </AuthProvider>
         </ToastProvider>
       </body>

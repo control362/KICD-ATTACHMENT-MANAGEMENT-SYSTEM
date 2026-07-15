@@ -85,8 +85,8 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
           gpa: prof?.gpa?.toString() || "",
           gender: prof?.gender || "",
           bio: prof?.bio || "",
-          idDocumentPath: app?.resumeUrl ? "" : "", 
-          cvDocumentPath: "",
+          idDocumentPath: prof?.idDocumentUrl || "", 
+          cvDocumentPath: prof?.resumeUrl || "",
         });
 
         sessionStorage.removeItem("kicd_pending_opportunity");
@@ -94,7 +94,7 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
 
       } catch (err: any) {
         if (err.message === "You have already applied for this opportunity.") {
-          router.push("/application/status");
+          router.push("/applications");
           return;
         }
         setError(err.message || "Could not start application.");
@@ -165,7 +165,9 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
         gender: state.gender || null,
         bio: state.bio || null,
         yearOfStudy: state.yearOfStudy ? parseInt(state.yearOfStudy) : null,
-        phoneNumber: state.phoneNumber || null
+        phoneNumber: state.phoneNumber || null,
+        idDocumentUrl: state.idDocumentPath || profile?.idDocumentUrl || null,
+        resumeUrl: state.cvDocumentPath || profile?.resumeUrl || null
       };
 
       await api.put(`/api/profile/${profile.studentId}`, profileDto);
@@ -202,16 +204,16 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
   if (error) return <div className="text-center py-16"><p className="text-danger font-medium">Could not start application.</p><p className="text-sm text-on-surface-variant mt-1">{error}</p></div>;
 
   return (
-    <div className="max-w-[1000px] mx-auto p-4 md:p-8">
-      <div className="mb-10 text-center">
-        <h1 className="text-3xl font-bold text-primary mb-2 tracking-tight">Apply: {opportunity?.title}</h1>
-        <p className="text-base text-on-surface-variant">{opportunity?.departmentName || 'KICD'}</p>
+    <div className="p-lg lg:p-xl max-w-[1000px] mx-auto w-full flex flex-col items-center">
+      <div className="mb-xl text-center">
+        <h1 className="font-display-md text-display-md text-primary mb-xs tracking-tight">Apply: {opportunity?.title}</h1>
+        <p className="font-body-lg text-body-lg text-on-surface-variant">{opportunity?.departmentName || 'KICD'}</p>
       </div>
       
       {/* Stepper */}
-      <div className="mb-12 flex items-center justify-between relative px-2 sm:px-8 max-w-3xl mx-auto">
-        <div className="absolute left-10 right-10 sm:left-16 sm:right-16 top-5 transform -translate-y-1/2 h-1 bg-surface-container-highest z-0"></div>
-        <div className="absolute left-10 sm:left-16 top-5 transform -translate-y-1/2 h-1 bg-success z-0 transition-all duration-500" style={{ width: step === 0 ? '0%' : (step === 1 ? '50%' : '100%') }}></div>
+      <div className="mb-xl flex items-start justify-between relative w-full max-w-[600px]">
+        <div className="absolute left-[15%] right-[15%] top-5 transform -translate-y-1/2 h-1 bg-surface-container-highest z-0"></div>
+        <div className="absolute left-[15%] top-5 transform -translate-y-1/2 h-1 bg-success z-0 transition-all duration-500" style={{ width: step === 0 ? '0%' : (step === 1 ? '50%' : '70%') }}></div>
         {STEPS.map((label, i) => {
           const isActive = i === step;
           const isCompleted = i < step;
@@ -225,116 +227,114 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
           if (isCompleted) textClass = "text-success font-semibold";
 
           return (
-            <div key={i} className="relative z-10 flex flex-col items-center gap-2 flex-1 cursor-pointer" onClick={() => (isCompleted || isActive) && setStep(i)}>
+            <div key={i} className="relative z-10 flex flex-col items-center gap-sm cursor-pointer w-24 sm:w-32" onClick={() => (isCompleted || isActive) && setStep(i)}>
               <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 shadow-sm transition-colors ${circleClass}`}>
                 {isCompleted ? <span className="material-symbols-outlined text-[20px]">check</span> : i + 1}
               </div>
-              <span className={`text-xs ${textClass} text-center hidden sm:block whitespace-nowrap`}>{label}</span>
+              <span className={`text-xs ${textClass} text-center mt-xs leading-tight`}>{label}</span>
             </div>
           );
         })}
       </div>
       
       {/* Form Container */}
-      <form onSubmit={e => { e.preventDefault(); handleNext(); }} className="bg-white border border-outline-variant rounded-2xl p-6 md:p-10 shadow-sm">
-        <h2 className="text-2xl font-bold text-primary mb-8 border-b border-surface-container-highest pb-4 tracking-tight">{STEPS[step]}</h2>
+      <form onSubmit={e => { e.preventDefault(); handleNext(); }} className="bg-surface-default border border-border-light rounded-xl p-lg md:p-xl shadow-sm w-full max-w-[800px]">
+        <h2 className="font-headline-md text-headline-md text-primary mb-lg pb-sm border-b border-border-light tracking-tight">{STEPS[step]}</h2>
         
         {step === 0 && (
-          <div className="space-y-6">
-            <p className="text-sm text-on-surface-variant mb-4">Please verify or fill in your essential profile details. This information will be saved to your profile when you submit the application.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-on-surface-variant mb-2">First name</label>
-                <input required type="text" value={state.firstName} onChange={e => setState({...state, firstName: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
+          <div className="flex flex-col gap-lg">
+            <p className="font-body-md text-body-md text-on-surface-variant mb-md">Please verify or fill in your essential profile details. This information will be saved to your profile when you submit the application.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">First name</label>
+                <input required type="text" value={state.firstName} onChange={e => setState({...state, firstName: e.target.value})} className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full" />
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Last name</label>
-                <input required type="text" value={state.lastName} onChange={e => setState({...state, lastName: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-on-surface-variant mb-2">University</label>
-                <input required type="text" value={state.university} onChange={e => setState({...state, university: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Course name</label>
-                <input required type="text" value={state.courseName} onChange={e => setState({...state, courseName: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Last name</label>
+                <input required type="text" value={state.lastName} onChange={e => setState({...state, lastName: e.target.value})} className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full" />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Admission Number</label>
-                <input required type="text" value={state.admissionNumber} onChange={e => setState({...state, admissionNumber: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">University</label>
+                <input required type="text" value={state.university} onChange={e => setState({...state, university: e.target.value})} className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full" />
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Target Department</label>
-                <select required value={state.departmentId} onChange={e => setState({...state, departmentId: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant">
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Course name</label>
+                <input required type="text" value={state.courseName} onChange={e => setState({...state, courseName: e.target.value})} className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Admission Number</label>
+                <input required type="text" value={state.admissionNumber} onChange={e => setState({...state, admissionNumber: e.target.value})} className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full" />
+              </div>
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Target Department</label>
+                <select required value={state.departmentId} onChange={e => setState({...state, departmentId: e.target.value})} className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full">
                   <option value="" disabled>Select Department</option>
                   {departments.map(d => <option key={d.departmentId} value={d.departmentId}>{d.name}</option>)}
                 </select>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Year of Study</label>
-                <input required type="number" min="1" max="7" value={state.yearOfStudy} onChange={e => setState({...state, yearOfStudy: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Year of Study</label>
+                <input required type="number" min="1" max="7" value={state.yearOfStudy} onChange={e => setState({...state, yearOfStudy: e.target.value})} className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full" />
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Phone Number</label>
-                <input required type="text" value={state.phoneNumber} onChange={e => setState({...state, phoneNumber: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Phone Number</label>
+                <input required type="text" value={state.phoneNumber} onChange={e => setState({...state, phoneNumber: e.target.value})} className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full" />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Current GPA</label>
-                <input required type="number" step="0.01" min="0" max="5" value={state.gpa} onChange={e => setState({...state, gpa: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Current GPA</label>
+                <input required type="number" step="0.01" min="0" max="5" value={state.gpa} onChange={e => setState({...state, gpa: e.target.value})} className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full" />
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-on-surface-variant mb-2">Gender</label>
-                <select required value={state.gender} onChange={e => setState({...state, gender: e.target.value})} className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant">
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-sm text-label-sm text-text-secondary">Gender</label>
+                <select required value={state.gender} onChange={e => setState({...state, gender: e.target.value})} className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full">
                   <option value="" disabled>Select Gender</option>
                   <option value="MALE">Male</option>
                   <option value="FEMALE">Female</option>
-                  <option value="OTHER">Other</option>
-                  <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
                 </select>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Bio</label>
-              <textarea required rows={3} value={state.bio} onChange={e => setState({...state, bio: e.target.value})} placeholder="Tell us a little bit about yourself..." className="block w-full px-4 py-3 border border-outline-variant rounded-lg text-on-surface bg-white focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-shadow text-base placeholder-outline-variant"></textarea>
+            <div className="flex flex-col gap-xs">
+              <label className="font-label-sm text-label-sm text-text-secondary">Bio</label>
+              <textarea required rows={3} value={state.bio} onChange={e => setState({...state, bio: e.target.value})} placeholder="Tell us a little bit about yourself..." className="border border-border-light rounded-lg px-md py-sm bg-surface-default text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-fixed focus:border-primary transition-all duration-200 w-full"></textarea>
             </div>
           </div>
         )}
 
         {step === 1 && (
-          <div className="space-y-8">
+          <div className="flex flex-col gap-xl">
             <div>
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Upload National ID / Student ID</label>
-              <div className="border-2 border-dashed border-outline-variant rounded-xl p-8 text-center bg-surface-container-lowest">
+              <label className="font-label-md text-label-md text-text-secondary mb-sm block">Upload National ID / Student ID</label>
+              <div className="border-2 border-dashed border-border-light rounded-xl p-xl text-center bg-surface-container hover:bg-surface-subtle transition-colors">
                   <input type="file" id="id-upload" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={e => handleFileUpload(e, 'idDocumentPath', setUploadingId)} />
                   <label htmlFor="id-upload" className="cursor-pointer flex flex-col items-center">
-                      <span className="material-symbols-outlined text-4xl text-primary mb-2">upload_file</span>
-                      <span className="font-bold text-primary hover:underline">Click to browse</span>
-                      <span className="text-xs text-on-surface-variant mt-1">PDF, JPG, PNG (Max 5MB)</span>
+                      <span className="material-symbols-outlined text-4xl text-primary mb-sm">upload_file</span>
+                      <span className="font-label-lg text-label-lg text-primary hover:underline">Click to browse</span>
+                      <span className="font-body-sm text-body-sm text-on-surface-variant mt-xs">PDF, JPG, PNG (Max 5MB)</span>
                   </label>
-                  <div className={`mt-4 text-sm font-bold ${uploadingId ? 'text-primary' : state.idDocumentPath ? 'text-success' : 'text-on-surface-variant'}`}>
+                  <div className={`mt-md font-label-md text-label-md ${uploadingId ? 'text-primary' : state.idDocumentPath ? 'text-success' : 'text-on-surface-variant'}`}>
                     {uploadingId ? 'Uploading...' : state.idDocumentPath ? 'Uploaded successfully!' : ''}
                   </div>
               </div>
             </div>
             
             <div>
-              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Upload Curriculum Vitae (CV)</label>
-              <div className="border-2 border-dashed border-outline-variant rounded-xl p-8 text-center bg-surface-container-lowest">
+              <label className="font-label-md text-label-md text-text-secondary mb-sm block">Upload Curriculum Vitae (CV)</label>
+              <div className="border-2 border-dashed border-border-light rounded-xl p-xl text-center bg-surface-container hover:bg-surface-subtle transition-colors">
                   <input type="file" id="cv-upload" className="hidden" accept=".pdf,.doc,.docx" onChange={e => handleFileUpload(e, 'cvDocumentPath', setUploadingCv)} />
                   <label htmlFor="cv-upload" className="cursor-pointer flex flex-col items-center">
-                      <span className="material-symbols-outlined text-4xl text-primary mb-2">upload_file</span>
-                      <span className="font-bold text-primary hover:underline">Click to browse</span>
-                      <span className="text-xs text-on-surface-variant mt-1">PDF, DOCX (Max 5MB)</span>
+                      <span className="material-symbols-outlined text-4xl text-primary mb-sm">upload_file</span>
+                      <span className="font-label-lg text-label-lg text-primary hover:underline">Click to browse</span>
+                      <span className="font-body-sm text-body-sm text-on-surface-variant mt-xs">PDF, DOCX (Max 5MB)</span>
                   </label>
-                  <div className={`mt-4 text-sm font-bold ${uploadingCv ? 'text-primary' : state.cvDocumentPath ? 'text-success' : 'text-on-surface-variant'}`}>
+                  <div className={`mt-md font-label-md text-label-md ${uploadingCv ? 'text-primary' : state.cvDocumentPath ? 'text-success' : 'text-on-surface-variant'}`}>
                     {uploadingCv ? 'Uploading...' : state.cvDocumentPath ? 'Uploaded successfully!' : ''}
                   </div>
               </div>
@@ -343,44 +343,42 @@ export default function ApplyWizard({ params }: { params: Promise<{ id: string }
         )}
 
         {step === 2 && (
-          <>
-            <div className="space-y-1 divide-y divide-surface-container-highest bg-surface-container-low rounded-xl p-6 border border-outline-variant mb-6">
-              {[
-                ["First name", state.firstName], 
-                ["Last name", state.lastName],
-                ["University", state.university], 
-                ["Course", state.courseName],
-                ["ID Document", state.idDocumentPath ? "Uploaded" : "Missing!"],
-                ["CV Document", state.cvDocumentPath ? "Uploaded" : "Missing!"],
-              ].map(([label, value], i) => (
-                <div key={i} className="flex justify-between py-3 text-sm">
-                  <span className="font-semibold text-on-surface-variant uppercase tracking-wider text-xs">{label}</span>
-                  <span className={`font-medium ${value === 'Missing!' ? 'text-error' : 'text-on-surface'} text-right max-w-[60%] break-words`}>{value}</span>
-                </div>
-              ))}
-            </div>
-          </>
+          <div className="flex flex-col gap-sm divide-y divide-border-light bg-surface-container rounded-xl p-lg border border-border-light">
+            {[
+              ["First name", state.firstName], 
+              ["Last name", state.lastName],
+              ["University", state.university], 
+              ["Course", state.courseName],
+              ["ID Document", state.idDocumentPath ? "Uploaded" : "Missing!"],
+              ["CV Document", state.cvDocumentPath ? "Uploaded" : "Missing!"],
+            ].map(([label, value], i) => (
+              <div key={i} className="flex justify-between py-sm">
+                <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{label}</span>
+                <span className={`font-body-md text-body-md ${value === 'Missing!' ? 'text-error font-bold' : 'text-on-surface'} text-right max-w-[60%] break-words`}>{value}</span>
+              </div>
+            ))}
+          </div>
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between mt-10 pt-6 border-t border-surface-container-highest">
-          <div className="flex gap-4 items-center">
+        <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-md mt-xl pt-lg border-t border-border-light">
+          <div className="flex gap-md items-center w-full sm:w-auto justify-between sm:justify-start">
             {step > 0 ? (
-              <button onClick={handleBack} type="button" className="font-semibold text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2">
+              <button onClick={handleBack} type="button" className="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-xs">
                 <span className="material-symbols-outlined text-[20px]">arrow_back</span> Back
               </button>
-            ) : <span></span>}
-            <button onClick={() => setShowCancelModal(true)} type="button" className="font-semibold text-error/80 hover:text-error transition-colors flex items-center gap-2" disabled={submitting}>
+            ) : <span className="hidden sm:block"></span>}
+            <button onClick={() => setShowCancelModal(true)} type="button" className="font-label-md text-label-md text-error/80 hover:text-error transition-colors flex items-center gap-xs" disabled={submitting}>
               <span className="material-symbols-outlined text-[20px]">cancel</span> Cancel
             </button>
           </div>
           
           {step < STEPS.length - 1 ? (
-            <button onClick={step === 0 ? undefined : handleNext} type={step === 0 ? "submit" : "button"} className="bg-primary text-white font-semibold text-base px-6 py-3.5 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+            <button onClick={step === 0 ? undefined : handleNext} type={step === 0 ? "submit" : "button"} className="w-full sm:w-auto bg-primary text-white font-label-md text-label-md px-xl py-sm rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm flex items-center justify-center gap-xs">
               Next Step <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
             </button>
           ) : (
-            <button onClick={handleSubmit} disabled={!state.idDocumentPath || !state.cvDocumentPath || submitting} className="bg-success text-white font-semibold text-base px-6 py-3.5 rounded-lg hover:bg-success/90 transition-colors disabled:opacity-60 shadow-sm flex items-center gap-2">
+            <button onClick={handleSubmit} disabled={!state.idDocumentPath || !state.cvDocumentPath || submitting} className="w-full sm:w-auto bg-success text-white font-label-md text-label-md px-xl py-sm rounded-lg hover:bg-success/90 transition-colors disabled:opacity-60 shadow-sm flex items-center justify-center gap-xs">
               {submitting ? "Submitting..." : "Submit Application"} <span className="material-symbols-outlined text-[20px]">check_circle</span>
             </button>
           )}

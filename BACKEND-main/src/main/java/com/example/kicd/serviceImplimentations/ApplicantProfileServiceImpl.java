@@ -73,6 +73,8 @@ public class ApplicantProfileServiceImpl implements ApplicantProfileService {
                 .gpa(dto.getGpa())
                 .bio(dto.getBio())
                 .profilePhotoUrl(dto.getProfilePhotoUrl())
+                .idDocumentUrl(dto.getIdDocumentUrl())
+                .resumeUrl(dto.getResumeUrl())
                 .build();
 
         applicantProfile.setProfileCompleted(isProfileComplete(applicantProfile));
@@ -130,6 +132,9 @@ public class ApplicantProfileServiceImpl implements ApplicantProfileService {
         applicantProfile.setGpa(dto.getGpa());
         applicantProfile.setBio(dto.getBio());
         applicantProfile.setProfilePhotoUrl(dto.getProfilePhotoUrl());
+        applicantProfile.setIdDocumentUrl(dto.getIdDocumentUrl());
+        applicantProfile.setResumeUrl(dto.getResumeUrl());
+        
         if (dto.getAdmissionNumber() != null && !dto.getAdmissionNumber().trim().isEmpty()) {
             ApplicantProfile existingWithAdmissionNo = ApplicantProfileRepository.findByAdmissionNumber(dto.getAdmissionNumber().trim()).orElse(null);
             if (existingWithAdmissionNo != null && !existingWithAdmissionNo.getStudentId().equals(applicantProfile.getStudentId())) {
@@ -182,6 +187,8 @@ public class ApplicantProfileServiceImpl implements ApplicantProfileService {
                 && student.getPhoneNumber() != null && !student.getPhoneNumber().trim().isEmpty()
                 && student.getGpa() != null
                 && student.getGender() != null
-                && student.getBio() != null && !student.getBio().trim().isEmpty();
+                && student.getBio() != null && !student.getBio().trim().isEmpty()
+                && student.getIdDocumentUrl() != null && !student.getIdDocumentUrl().trim().isEmpty()
+                && student.getResumeUrl() != null && !student.getResumeUrl().trim().isEmpty();
     }
 }

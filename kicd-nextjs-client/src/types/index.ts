@@ -29,7 +29,8 @@ export interface ApplicantProfile {
   gpa?: number;
   bio?: string;
   profileCompleted?: boolean;
-  documents?: any[]; // Simplified for now
+  idDocumentUrl?: string;
+  resumeUrl?: string;
 }
 
 export interface OpportunityDocument {

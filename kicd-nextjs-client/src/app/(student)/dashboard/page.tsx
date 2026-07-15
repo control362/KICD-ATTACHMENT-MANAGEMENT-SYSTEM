@@ -126,7 +126,7 @@ export default function StudentDashboard() {
             <div>
               <div className="flex justify-between items-center mb-lg">
                 <h3 className="font-headline-md text-headline-md text-primary">Active Opportunities</h3>
-                <Link href="/" className="text-primary font-label-md text-label-md hover:underline">View All</Link>
+                <Link href="/opportunities" className="text-primary font-label-md text-label-md hover:underline">View All</Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
                 {opportunities.length === 0 ? (
@@ -134,15 +134,16 @@ export default function StudentDashboard() {
                 ) : opportunities.slice(0, 4).map(opp => {
                   const existingApp = applications.find(a => a.opportunity?.opportunityId === opp.opportunityId);
                   return (
-                    <div key={opp.opportunityId} className="bg-surface-default border border-border-light p-lg rounded-xl hover:shadow-md transition-shadow flex flex-col">
-                      <div className="flex justify-between items-start mb-md">
-                        <div className="h-10 w-10 bg-primary-fixed rounded-lg flex items-center justify-center">
-                          <span className="material-symbols-outlined text-primary">work</span>
+                    <div key={opp.opportunityId} className="bg-surface-default border border-border-light rounded-xl hover:shadow-md transition-shadow flex flex-col overflow-hidden">
+                      <div className="relative w-full h-32">
+                        <img src={opp.imageUrl ? (opp.imageUrl.startsWith("http") || opp.imageUrl.startsWith("/kicd_") ? opp.imageUrl : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'}${opp.imageUrl}`) : "/kicd_professional_growth.png"} alt={opp.title} className="w-full h-full object-cover" />
+                        <div className="absolute top-2 right-2 px-2 py-1 bg-surface/90 text-on-surface-variant text-[10px] uppercase font-bold tracking-widest rounded-full shadow-sm backdrop-blur-md">
+                          {opp.numberOfSlots} Slots
                         </div>
-                        <span className="px-3 py-1 bg-surface-container-low text-on-surface-variant text-label-sm rounded-full">{opp.numberOfSlots} Open Positions</span>
                       </div>
-                      <h4 className="font-headline-sm text-headline-sm text-primary mb-1">{opp.title}</h4>
-                      <p className="text-body-sm text-on-surface-variant mb-lg flex-1">{opp.department?.name || 'KICD'} • {opp.duration || 'N/A'}</p>
+                      <div className="p-md flex flex-col flex-grow">
+                        <h4 className="font-headline-sm text-headline-sm text-primary mb-1">{opp.title}</h4>
+                        <p className="text-body-sm text-on-surface-variant mb-lg flex-1">{opp.department?.name || 'KICD'} • {opp.duration || 'N/A'}</p>
                       <div className="flex gap-sm mt-auto">
                         {!existingApp ? (
                           <Link href={`/apply/${opp.opportunityId}`} className="flex-1 bg-primary text-on-primary py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity text-center flex items-center justify-center">Apply Now</Link>
@@ -151,6 +152,7 @@ export default function StudentDashboard() {
                         ) : (
                           <Link href={`/applications/${existingApp.applicationId}`} className="flex-1 bg-surface-container-high text-on-surface py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity text-center flex items-center justify-center">View Application</Link>
                         )}
+                      </div>
                       </div>
                     </div>
                   );

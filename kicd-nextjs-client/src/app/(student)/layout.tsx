@@ -7,7 +7,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       <GlobalNavBar />
       <div className="flex w-full flex-1 overflow-hidden">
         <StudentSidebar />
-        <main className="flex-1 overflow-y-auto w-full">
+        <main className="flex-1 overflow-y-auto w-full relative">
           {children}
         </main>
       </div>

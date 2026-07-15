@@ -72,6 +72,12 @@ public class ApplicantProfile extends BaseEntity {
     @Column(name = "profile_photo_url", columnDefinition = "TEXT")
     private String profilePhotoUrl;
 
+    @Column(name = "id_document_url", columnDefinition = "TEXT")
+    private String idDocumentUrl;
+
+    @Column(name = "resume_url", columnDefinition = "TEXT")
+    private String resumeUrl;
+
     @Column(name = "profile_completed", nullable = false)
     private Boolean profileCompleted = false;
 

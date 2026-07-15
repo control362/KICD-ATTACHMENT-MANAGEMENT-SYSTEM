@@ -41,10 +41,12 @@ export default function ApplicationsList() {
   };
 
   return (
-    <div className="p-lg lg:p-xl">
-      <header className="mb-8">
-        <h2 className="text-3xl font-bold text-primary tracking-tight">My Applications</h2>
-        <p className="text-lg text-on-surface-variant mt-1">Track the status of all your submitted and draft applications.</p>
+    <div className="p-lg lg:p-xl max-w-[1440px] mx-auto w-full">
+      <header className="mb-xl flex items-center justify-between">
+        <div>
+          <h2 className="font-headline-lg text-headline-lg md:font-display-lg md:text-display-lg text-primary tracking-tight">My Applications</h2>
+          <p className="font-body-md text-body-md text-on-surface-variant mt-xs">Track the status of all your submitted and draft applications.</p>
+        </div>
       </header>
 
       <div className="bg-surface-default border border-border-light rounded-xl overflow-hidden shadow-sm">

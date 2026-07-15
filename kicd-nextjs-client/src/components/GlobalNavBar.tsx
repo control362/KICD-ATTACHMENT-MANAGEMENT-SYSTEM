@@ -4,10 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 
+import { useSidebar } from "./SidebarContext";
+
 export function GlobalNavBar() {
   const pathname = usePathname();
   const { user, logout, isStudent, isStaff, isAdmin } = useAuth();
   const isLoggedIn = !!user;
+  const { toggleSidebar } = useSidebar();
 
   const navItem = (href: string, label: string) => {
     const active = pathname === href || pathname.startsWith(`${href}/`);
@@ -20,87 +23,56 @@ export function GlobalNavBar() {
   };
 
   return (
-    <header className="w-full bg-surface shadow-sm sticky top-0 z-50 border-b border-border-light">
-      <div className="container mx-auto max-w-[1440px] px-6 py-3 md:py-4 flex items-center justify-between">
-        {/* Left: Logo & Branding */}
-        <Link href="/" className="flex items-center group py-1">
-          <img 
-            alt="KICD Logo" 
-            className="h-16 md:h-20 lg:h-24 w-auto object-contain transition-transform group-hover:scale-105" 
-            src="/kicd-logo.png" 
-          />
-        </Link>
+    <>
+      <header className="w-full bg-surface shadow-sm sticky top-0 z-40 border-b border-border-light">
+        <div className="container mx-auto max-w-[1440px] px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
+          {/* Left: Hamburger & Logo */}
+          <div className="flex items-center gap-2 md:gap-4 -ml-2 md:-ml-4">
+            {isLoggedIn && (
+              <button 
+                onClick={toggleSidebar}
+                className="flex items-center p-2 hover:bg-primary/10 rounded-lg transition-all duration-300 text-on-surface hover:text-primary focus:outline-none cursor-pointer group"
+                aria-label="Open menu"
+              >
+                <span className="material-symbols-outlined text-[64px] md:text-[80px] transition-transform duration-300 group-hover:scale-110">menu</span>
+              </button>
+            )}
+            
+            <Link href="/" className="flex items-center group py-1 ml-2">
+              <img 
+                alt="KICD Logo" 
+                className="h-12 md:h-16 lg:h-20 w-auto object-contain transition-transform group-hover:scale-105" 
+                src="/kicd-logo.png" 
+              />
+            </Link>
+          </div>
 
-        {/* Middle: Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-8">
-          {!isLoggedIn && navItem("/", "Home")}
-          {isLoggedIn && isStaff && (
-            <>
-              {navItem("/reviewer/dashboard", "Dashboard")}
-              {navItem("/reviewer/applications", "Applications")}
-              {navItem("/reviewer/opportunities", "Opportunities")}
-              {navItem("/reviewer/departments", "Departments")}
-              {navItem("/reviewer/reports", "Reports")}
-              {isAdmin && navItem("/reviewer/staff", "Staff")}
-              {navItem("/reviewer/settings", "Settings")}
-            </>
-          )}
-        </nav>
-
-        {/* Right: Actions & Auth */}
-        <div className="flex items-center gap-sm md:gap-md">
-          {isLoggedIn ? (
-            <div className="flex items-center gap-4">
-              {isStudent ? (
-                <Link href="/profile" className="relative group flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors">
-                  <span className="material-symbols-outlined text-primary text-[24px]">person</span>
-                  <div className="absolute top-full right-0 mt-2 whitespace-nowrap bg-surface-container-high border border-border-light text-on-surface px-3 py-1.5 rounded shadow-lg text-sm font-medium opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
-                    {user.email}
-                  </div>
+          {/* Right: Actions & Auth */}
+          <div className="flex items-center gap-sm md:gap-md">
+            {isLoggedIn ? (
+              <div className="flex items-center gap-4">
+                <Link 
+                  href={user.role === 'STUDENT' ? '/profile' : '/reviewer/settings'} 
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                  title="Profile Settings"
+                >
+                  <span className="material-symbols-outlined">person</span>
                 </Link>
-              ) : (
-                <>
-                  <div className="hidden md:flex flex-col items-end">
-                    <span className="text-sm font-bold text-primary leading-tight">{user.email}</span>
-                    <span className="text-xs text-text-secondary uppercase tracking-wider">{user.role.replace('_', ' ')}</span>
-                  </div>
-                  <button 
-                    onClick={logout} 
-                    className="px-5 py-2 rounded-lg font-label-md text-label-md bg-error-container text-on-error-container hover:bg-error hover:text-white transition-all duration-200 shadow-sm hover:shadow"
-                  >
-                    Logout
-                  </button>
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Link href="/login" className="px-5 py-2 rounded-lg font-label-md text-label-md text-primary border border-primary hover:bg-primary-fixed-dim transition-all duration-200">
-                Login
-              </Link>
-              <Link href="/register" className="px-5 py-2 rounded-lg font-label-md text-label-md bg-primary text-white hover:bg-primary-container transition-all duration-200 shadow-md hover:shadow-lg">
-                Apply Now
-              </Link>
-            </div>
-          )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link href="/login" className="px-5 py-2 rounded-lg font-label-md text-label-md text-primary border border-primary hover:bg-primary-fixed-dim transition-all duration-200">
+                  Login
+                </Link>
+                <Link href="/register" className="px-5 py-2 rounded-lg font-label-md text-label-md bg-primary text-white hover:bg-primary-container transition-all duration-200 shadow-md hover:shadow-lg">
+                  Apply Now
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      
-      {/* Mobile Navigation */}
-      <nav className="lg:hidden w-full bg-surface-subtle border-t border-border-light flex overflow-x-auto px-4 py-2 gap-4">
-        {!isLoggedIn && navItem("/", "Home")}
-        {isLoggedIn && isStaff && (
-          <>
-            {navItem("/reviewer/dashboard", "Dashboard")}
-            {navItem("/reviewer/applications", "Applications")}
-            {navItem("/reviewer/opportunities", "Opportunities")}
-            {navItem("/reviewer/departments", "Departments")}
-            {navItem("/reviewer/reports", "Reports")}
-            {isAdmin && navItem("/reviewer/staff", "Staff")}
-            {navItem("/reviewer/settings", "Settings")}
-          </>
-        )}
-      </nav>
-    </header>
+      </header>
+
+    </>
   );
 }

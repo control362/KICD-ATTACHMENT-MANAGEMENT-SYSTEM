@@ -82,6 +82,7 @@ public class OpportunityServiceImpl implements OpportunityService {
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .featured(request.getFeatured() != null ? request.getFeatured() : false)
+                .imageUrl(request.getImageUrl())
                 .numberOfSlots(request.getNumberOfSlots())
                 .applicationDeadline(request.getApplicationDeadline())
                 .status(request.getStatus().toUpperCase())
@@ -125,6 +126,7 @@ public class OpportunityServiceImpl implements OpportunityService {
         opp.setStartDate(request.getStartDate());
         opp.setEndDate(request.getEndDate());
         opp.setFeatured(request.getFeatured() != null ? request.getFeatured() : false);
+        opp.setImageUrl(request.getImageUrl());
         opp.setNumberOfSlots(request.getNumberOfSlots());
         opp.setApplicationDeadline(request.getApplicationDeadline());
         opp.setStatus(request.getStatus().toUpperCase());

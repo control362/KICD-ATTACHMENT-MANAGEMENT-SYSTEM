@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { api, ApiError } from "@/lib/api";
+import { api, ApiError, getFileUrl } from "@/lib/api";
+import { API_BASE_URL } from "@/lib/config";
 import { Spinner } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/ToastContext";
 
@@ -12,6 +13,7 @@ export default function NewOpportunity() {
   const toast = useToast();
 
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState("");
   const [departments, setDepartments] = useState<any[]>([]);
 
@@ -30,7 +32,8 @@ export default function NewOpportunity() {
     location: "",
     workArrangement: "",
     startDate: "",
-    endDate: ""
+    endDate: "",
+    imageUrl: ""
   });
 
   useEffect(() => {
@@ -45,24 +48,73 @@ export default function NewOpportunity() {
     loadData();
   }, []);
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    setUploadingImage(true);
+    setError("");
+    
+    try {
+      const data = new FormData();
+      data.append("file", file);
+      
+      const result = await api.post("/api/documents/upload", data);
+      
+      setFormData(prev => ({...prev, imageUrl: result.fileUrl}));
+      toast.success("Image uploaded successfully!");
+    } catch (err: any) {
+      setError(err.message || "Failed to upload image.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setError("");
 
     try {
+      if (!formData.imageUrl) {
+        setError("Please upload a cover image before posting.");
+        document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+        setSaving(false);
+        return;
+      }
+
+      if (!formData.departmentId) {
+        setError("Please select a department.");
+        document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+        setSaving(false);
+        return;
+      }
+
       const payload = {
-        ...formData,
+        title: formData.title,
+        referenceNumber: formData.referenceNumber,
+        type: formData.type,
         departmentId: Number(formData.departmentId),
-        numberOfSlots: Number(formData.vacancies)
+        description: formData.description,
+        requirements: formData.requirements,
+        benefits: formData.benefits,
+        numberOfSlots: Number(formData.vacancies),
+        applicationDeadline: formData.applicationDeadline || null,
+        status: formData.status,
+        duration: formData.duration,
+        location: formData.location,
+        workArrangement: formData.workArrangement,
+        startDate: formData.startDate || null,
+        endDate: formData.endDate || null,
+        imageUrl: formData.imageUrl
       };
 
       await api.post(`/api/opportunities`, payload);
-      toast.success("Opportunity created successfully!");
+      toast.success("Opportunity posted successfully!");
       router.push("/reviewer/opportunities");
     } catch (err: any) {
-      setError(err instanceof ApiError ? err.message : "Failed to create opportunity.");
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      console.error("Opportunity Post Failed:", err, err?.fieldErrors, err?.message);
+      setError(err instanceof ApiError ? err.message : "Failed to create opportunity. Please check console logs.");
+      document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setSaving(false);
     }
@@ -121,6 +173,18 @@ export default function NewOpportunity() {
             <div>
               <label className="block text-sm font-semibold text-on-surface-variant mb-2">Vacancies <span className="text-danger">*</span></label>
               <input required type="number" min="1" value={formData.vacancies} onChange={e => setFormData({...formData, vacancies: parseInt(e.target.value) || 1})} className="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-on-surface-variant mb-2">Cover Image <span className="text-danger">*</span></label>
+              <div className="flex items-center gap-4">
+                <input required={!formData.imageUrl} type="file" accept="image/*" onChange={handleImageUpload} className="block w-full text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors" />
+                {uploadingImage && <Spinner className="w-6 h-6 border-primary" />}
+              </div>
+              {formData.imageUrl && (
+                <div className="mt-4 rounded-xl overflow-hidden border border-border-light w-full sm:w-80 h-48 bg-surface-container-highest flex items-center justify-center">
+                  <img src={getFileUrl(formData.imageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -4,6 +4,8 @@ import { useEffect, useState, useRef, ReactNode } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { GlobalNavBar } from "@/components/GlobalNavBar";
+import { StudentSidebar } from "@/components/StudentSidebar";
+import { StaffSidebar } from "@/components/StaffSidebar";
 import { useAuth } from "@/components/AuthProvider";
 import { useRouter } from "next/navigation";
 import { Footer } from "@/components/Footer";
@@ -111,10 +113,11 @@ export default function LandingPage() {
       router.push("/register");
     }
   };
-
   return (
     <div className="min-h-screen bg-surface text-on-surface antialiased font-body-md flex flex-col">
       <GlobalNavBar />
+      <StudentSidebar />
+      <StaffSidebar />
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative w-full h-[600px] flex items-center justify-center overflow-hidden">
@@ -169,34 +172,28 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
             <FadeInSection delay={0}>
-              <div className="glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col items-start gap-md border border-border-light">
-                <div className="w-12 h-12 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
-                  <span className="material-symbols-outlined text-2xl">trending_up</span>
-                </div>
-                <div>
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Professional Growth</h3>
+              <div className="glass-card rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col items-start border border-border-light overflow-hidden">
+                <img src="/kicd_professional_growth.png" alt="Professional Growth" className="w-full h-48 object-cover" />
+                <div className="p-lg flex flex-col gap-sm">
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface">Professional Growth</h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">Gain invaluable hands-on experience working alongside industry experts in curriculum design and educational technology.</p>
                 </div>
               </div>
             </FadeInSection>
             <FadeInSection delay={150}>
-              <div className="glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col items-start gap-md border border-border-light">
-                <div className="w-12 h-12 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary">
-                  <span className="material-symbols-outlined text-2xl">groups</span>
-                </div>
-                <div>
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Expert Mentorship</h3>
+              <div className="glass-card rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col items-start border border-border-light overflow-hidden">
+                <img src="/kicd_expert_mentorship.png" alt="Expert Mentorship" className="w-full h-48 object-cover" />
+                <div className="p-lg flex flex-col gap-sm">
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface">Expert Mentorship</h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">Receive guidance and structured feedback from seasoned professionals dedicated to nurturing new talent in the field.</p>
                 </div>
               </div>
             </FadeInSection>
             <FadeInSection delay={300}>
-              <div className="glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col items-start gap-md border border-border-light">
-                <div className="w-12 h-12 rounded-lg bg-tertiary-fixed flex items-center justify-center text-tertiary">
-                  <span className="material-symbols-outlined text-2xl">lightbulb</span>
-                </div>
-                <div>
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Innovation in Education</h3>
+              <div className="glass-card rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col items-start border border-border-light overflow-hidden">
+                <img src="/kicd_innovation_education.png" alt="Innovation in Education" className="w-full h-48 object-cover" />
+                <div className="p-lg flex flex-col gap-sm">
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface">Innovation in Education</h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">Contribute to forward-thinking projects that directly impact the national education ecosystem and learner outcomes.</p>
                 </div>
               </div>
@@ -246,15 +243,16 @@ export default function LandingPage() {
 
               return (
                 <FadeInSection key={opp.opportunityId} delay={idx * 100}>
-                  <div className="bg-surface rounded-xl border border-border-light p-md flex flex-col hover:bg-surface-subtle transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
-                    <div className="flex justify-between items-start mb-md">
-                      <div className={`w-10 h-10 rounded flex items-center justify-center ${colorTheme.bg} ${colorTheme.text}`}>
-                        <span className="material-symbols-outlined">{colorTheme.icon}</span>
+                  <div className="bg-surface rounded-xl border border-border-light flex flex-col hover:bg-surface-subtle transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md overflow-hidden">
+                    <div className="relative w-full h-48">
+                      <img src={opp.imageUrl ? (opp.imageUrl.startsWith("http") || opp.imageUrl.startsWith("/kicd_") ? opp.imageUrl : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'}${opp.imageUrl}`) : "/kicd_professional_growth.png"} alt={opp.title} className="w-full h-full object-cover" />
+                      <div className="absolute top-4 right-4 px-sm py-xs bg-surface/90 text-success rounded-full font-label-sm text-label-sm shadow-sm backdrop-blur-md">
+                        {opp.numberOfSlots} Positions
                       </div>
-                      <span className="px-sm py-xs bg-success/10 text-success rounded-full font-label-sm text-label-sm">{opp.numberOfSlots} Positions</span>
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider mb-2 text-text-secondary">{opp.departmentName}</span>
-                    <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">{opp.title}</h3>
+                    <div className="p-md flex flex-col flex-grow">
+                      <span className="text-xs font-bold uppercase tracking-wider mb-2 text-text-secondary">{opp.departmentName}</span>
+                      <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">{opp.title}</h3>
                     <p className="font-body-sm text-body-sm text-on-surface-variant mb-lg flex-grow line-clamp-2">{opp.description}</p>
                     <div className="flex justify-between items-center pt-md border-t border-border-light">
                       <span className="font-label-sm text-label-sm text-text-secondary flex items-center gap-xs">
@@ -264,6 +262,7 @@ export default function LandingPage() {
                         Apply Now
                       </button>
                     </div>
+                  </div>
                   </div>
                 </FadeInSection>
               );

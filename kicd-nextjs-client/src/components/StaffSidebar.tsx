@@ -4,18 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import { useSidebar } from "./SidebarContext";
-import useSWR from "swr";
-import { fetcher } from "@/lib/api";
-import { Application } from "@/types";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-export function StudentSidebar() {
-  const { user, logout } = useAuth();
+export function StaffSidebar() {
+  const { user, logout, isStaff, isAdmin } = useAuth();
   const pathname = usePathname();
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
-
-  const { data: applications } = useSWR<Application[]>(user ? "/api/applications/me" : null, fetcher);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   const isHomePage = pathname === "/";
 
@@ -29,22 +23,7 @@ export function StudentSidebar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  useEffect(() => {
-    const calculateUnread = () => {
-      if (!applications) return;
-      const notifications = applications.filter(app => app.status === 'APPROVED' || app.status === 'REJECTED');
-      const readIds = JSON.parse(localStorage.getItem('readNotificationIds') || '[]');
-      const unread = notifications.filter(n => !readIds.includes(n.applicationId)).length;
-      setUnreadCount(unread);
-    };
-
-    calculateUnread();
-    
-    window.addEventListener('notificationsRead', calculateUnread);
-    return () => window.removeEventListener('notificationsRead', calculateUnread);
-  }, [applications]);
-
-  const navItem = (href: string, icon: string, label: string, badge?: number) => {
+  const navItem = (href: string, icon: string, label: string) => {
     const isActive = href === "/" ? pathname === "/" : pathname?.startsWith(href);
     const hideText = !isSidebarOpen && !isHomePage;
     
@@ -64,19 +43,11 @@ export function StudentSidebar() {
           </span>
           {!hideText && <span className="text-[15px] whitespace-nowrap overflow-hidden transition-all duration-300">{label}</span>}
         </div>
-        {!hideText && badge !== undefined && badge > 0 && (
-          <span className="bg-error text-white text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">
-            {badge}
-          </span>
-        )}
-        {hideText && badge !== undefined && badge > 0 && (
-          <span className="absolute top-1 right-2 w-2 h-2 bg-error rounded-full"></span>
-        )}
       </Link>
     );
   };
 
-  if (!user || user.role !== "STUDENT") return null;
+  if (!user || !isStaff) return null;
 
   if (isHomePage) {
     // DRAWER MODE (for Home Page)
@@ -90,9 +61,14 @@ export function StudentSidebar() {
           className={`fixed top-0 left-0 h-full w-80 md:w-96 bg-[#1a4b8c] text-white z-[70] shadow-2xl flex flex-col py-8 px-4 transition-transform duration-300 ease-in-out transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
         >
           <div className="flex justify-between items-center mb-6 px-2 border-b border-white/10 pb-4">
-            <div className="font-headline-sm font-bold flex items-center gap-2">
-               <span className="material-symbols-outlined text-white">person</span>
-               <span>Student Menu</span>
+            <div className="font-headline-sm font-bold flex items-center gap-3">
+               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20">
+                 <span className="material-symbols-outlined text-white">person</span>
+               </div>
+               <div className="flex flex-col">
+                 <span className="text-[14px] truncate max-w-[150px]">{user.email}</span>
+                 <span className="text-[10px] uppercase opacity-70 font-normal">{user.role?.replace('_', ' ')}</span>
+               </div>
             </div>
             <button 
               onClick={() => setIsSidebarOpen(false)} 
@@ -104,12 +80,13 @@ export function StudentSidebar() {
           </div>
           <nav className="flex flex-col gap-2 relative flex-1 overflow-y-auto">
             {navItem("/", "home", "Home")}
-            {navItem("/dashboard", "grid_view", "Dashboard")}
-            {navItem("/applications", "description", "My Applications")}
-            {navItem("/opportunities", "work", "Open Opportunities")}
-            {navItem("/documents", "folder", "Documents")}
-            {navItem("/notifications", "notifications", "Notifications", unreadCount)}
-            {navItem("/profile", "settings", "Settings")}
+            {navItem("/reviewer/dashboard", "dashboard", "Dashboard")}
+            {navItem("/reviewer/applications", "description", "Applications")}
+            {navItem("/reviewer/opportunities", "work", "Opportunities")}
+            {navItem("/reviewer/departments", "domain", "Departments")}
+            {navItem("/reviewer/reports", "bar_chart", "Reports")}
+            {isAdmin && navItem("/reviewer/staff", "group", "Staff")}
+            {navItem("/reviewer/settings", "settings", "Settings")}
           </nav>
           <div className="mt-auto pt-6 px-1">
             <button 
@@ -129,14 +106,34 @@ export function StudentSidebar() {
   const isCollapsed = !isSidebarOpen;
   return (
     <aside className={`hidden md:flex flex-col py-8 px-3 bg-[#1a4b8c] text-white h-full overflow-y-auto overflow-x-hidden shadow-xl rounded-r-3xl my-0 shrink-0 transition-all duration-300 ${isCollapsed ? 'w-24' : 'w-72'}`}>
+      
+      {!isCollapsed ? (
+        <div className="flex items-center gap-3 mb-6 px-4 border-b border-white/10 pb-4 shrink-0 overflow-hidden">
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 shrink-0">
+            <span className="material-symbols-outlined text-white">person</span>
+          </div>
+          <div className="flex flex-col overflow-hidden">
+            <span className="text-[14px] truncate">{user.email}</span>
+            <span className="text-[10px] uppercase opacity-70 font-normal">{user.role?.replace('_', ' ')}</span>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center mb-6 px-2 border-b border-white/10 pb-4 shrink-0">
+           <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20" title={user.email}>
+            <span className="material-symbols-outlined text-white">person</span>
+          </div>
+        </div>
+      )}
+
       <nav className="flex flex-col gap-2 relative flex-1">
         {navItem("/", "home", "Home")}
-        {navItem("/dashboard", "grid_view", "Dashboard")}
-        {navItem("/applications", "description", "My Applications")}
-        {navItem("/opportunities", "work", "Open Opportunities")}
-        {navItem("/documents", "folder", "Documents")}
-        {navItem("/notifications", "notifications", "Notifications", unreadCount)}
-        {navItem("/profile", "settings", "Settings")}
+        {navItem("/reviewer/dashboard", "dashboard", "Dashboard")}
+        {navItem("/reviewer/applications", "description", "Applications")}
+        {navItem("/reviewer/opportunities", "work", "Opportunities")}
+        {navItem("/reviewer/departments", "domain", "Departments")}
+        {navItem("/reviewer/reports", "bar_chart", "Reports")}
+        {isAdmin && navItem("/reviewer/staff", "group", "Staff")}
+        {navItem("/reviewer/settings", "settings", "Settings")}
       </nav>
       <div className="mt-auto pt-6 px-1">
         <button 

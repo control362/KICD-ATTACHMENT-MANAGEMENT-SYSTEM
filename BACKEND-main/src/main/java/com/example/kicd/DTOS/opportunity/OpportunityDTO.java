@@ -29,6 +29,7 @@ public class OpportunityDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean featured;
+    private String imageUrl;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
     private List<OpportunityDocumentDTO> documents;
@@ -60,6 +61,7 @@ public class OpportunityDTO {
                 .startDate(opp.getStartDate())
                 .endDate(opp.getEndDate())
                 .featured(opp.getFeatured())
+                .imageUrl(opp.getImageUrl())
                 .status(opp.getStatus())
                 .createdAt(opp.getCreatedAt())
                 .updatedAt(opp.getUpdatedAt())

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api";
+import { api, getFileUrl } from "@/lib/api";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/components/ui/ToastContext";
 import { CenteredSpinner } from "@/components/ui/Spinner";
@@ -93,7 +93,9 @@ export default function ProfileEditPage() {
         gender: state.gender || null,
         bio: state.bio || null,
         yearOfStudy: state.yearOfStudy ? parseInt(state.yearOfStudy) : null,
-        phoneNumber: state.phoneNumber || null
+        phoneNumber: state.phoneNumber || null,
+        idDocumentUrl: profile?.idDocumentUrl || null,
+        resumeUrl: profile?.resumeUrl || null
       };
 
       await api.put(`/api/profile/${profile.studentId}`, payload);
@@ -163,7 +165,7 @@ export default function ProfileEditPage() {
 
             <div className="relative mb-md group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
               {state.profilePhotoUrl ? (
-                <img src={`http://localhost:8081${state.profilePhotoUrl}`} alt="Profile" className="w-32 h-32 rounded-full object-cover border-4 border-surface shadow-sm" />
+                <img src={getFileUrl(state.profilePhotoUrl)} alt="Profile" className="w-32 h-32 rounded-full object-cover border-4 border-surface shadow-sm" />
               ) : (
                 <div className="w-32 h-32 rounded-full border-4 border-surface shadow-sm bg-primary-fixed flex items-center justify-center text-primary text-5xl font-bold">
                   {state.firstName ? state.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
@@ -319,8 +321,6 @@ export default function ProfileEditPage() {
                   <option value="" disabled>Select Gender</option>
                   <option value="MALE">Male</option>
                   <option value="FEMALE">Female</option>
-                  <option value="OTHER">Other</option>
-                  <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
                 </select>
               </div>
 

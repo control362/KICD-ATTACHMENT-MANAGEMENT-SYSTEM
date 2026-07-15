@@ -47,20 +47,20 @@ export default function ApplicationDetail() {
   const currentIndex = currentApp.status === "PENDING" ? 1 : (currentApp.status === "DRAFT" ? 0 : 2);
 
   return (
-    <div className="max-w-[800px] mx-auto p-4 md:p-8">
-      <div className="mb-8">
-        <Link href="/applications" className="inline-flex items-center gap-2 text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors mb-6">
+    <div className="p-lg lg:p-xl max-w-[1000px] mx-auto w-full">
+      <header className="mb-xl">
+        <Link href="/applications" className="inline-flex items-center gap-xs font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors mb-md">
           <span className="material-symbols-outlined text-[18px]">arrow_back</span> Back to My Applications
         </Link>
-        <h1 className="text-3xl font-bold text-primary mb-2 tracking-tight">Application Timeline</h1>
-        <p className="text-on-surface-variant">View the detailed history and status of your application.</p>
-      </div>
+        <h1 className="font-headline-lg text-headline-lg md:font-display-lg md:text-display-lg text-primary tracking-tight">Application Timeline</h1>
+        <p className="font-body-md text-body-md text-on-surface-variant mt-xs">View the detailed history and status of your application.</p>
+      </header>
 
       <div className="flex flex-col h-full">
-        <h2 className="text-2xl font-bold text-primary mb-2">{currentApp.opportunity?.title || "Application"}</h2>
-        <p className="text-sm text-on-surface-variant mb-4">Department: {currentApp.opportunity?.departmentName || "KICD"}</p>
-        <div className="bg-white border border-outline-variant rounded-2xl p-6 md:p-10 shadow-sm mb-6 flex-1">
-          <h3 className="text-xl font-bold text-primary mb-8 pb-4 border-b border-surface-container-highest tracking-tight">Application History</h3>
+        <h2 className="font-headline-md text-headline-md text-primary mb-xs">{currentApp.opportunity?.title || "Application"}</h2>
+        <p className="font-body-sm text-body-sm text-on-surface-variant mb-lg">Department: {currentApp.opportunity?.departmentName || "KICD"}</p>
+        <div className="bg-surface-default border border-border-light rounded-xl p-lg shadow-sm flex-1 mb-lg">
+          <h3 className="font-headline-sm text-headline-sm text-primary mb-lg pb-sm border-b border-border-light tracking-tight">Application History</h3>
           
           <div className="relative pl-3">
             {/* Continuous vertical line */}

@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { api, ApiError } from "@/lib/api";
+import useSWR from "swr";
+import { api, fetcher, ApiError } from "@/lib/api";
 import { useAuth } from "@/components/AuthProvider";
 import { CenteredSpinner, Spinner } from "@/components/ui/Spinner";
+import { ApplicantProfile } from "@/types";
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const { data: profile } = useSWR<ApplicantProfile>("/api/profile/me", fetcher);
+  
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -106,17 +110,11 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2 md:col-span-2">
                 <label className="text-sm font-semibold text-on-surface-variant">Email Address</label>
-                <input className="border border-outline-variant rounded-lg px-4 py-3 bg-surface-container-low text-on-surface font-medium cursor-not-allowed" disabled type="email" value={user.email}/>
+                <input className="border border-outline-variant rounded-lg px-4 py-3 bg-surface-container-low text-on-surface font-medium cursor-default" readOnly type="email" value={user.email}/>
               </div>
               <div className="flex flex-col gap-2 md:col-span-2">
-                <label className="text-sm font-semibold text-on-surface-variant">System Role</label>
-                <input className="border border-outline-variant rounded-lg px-4 py-3 bg-surface-container-low text-on-surface font-medium cursor-not-allowed" disabled type="text" value={user.role.replace("_", " ")}/>
-              </div>
-              <div className="flex flex-col gap-2 md:col-span-2">
-                <p className="text-sm text-on-surface-variant bg-surface-container-low p-4 rounded-lg border border-outline-variant">
-                  <span className="font-bold flex items-center gap-2 mb-1"><span className="material-symbols-outlined text-[18px]">info</span> Note:</span> 
-                  Your account details are linked to your registration. To change these details, please contact the system administrator.
-                </p>
+                <label className="text-sm font-semibold text-on-surface-variant">Student Name</label>
+                <input className="border border-outline-variant rounded-lg px-4 py-3 bg-surface-container-low text-on-surface font-medium cursor-default" readOnly type="text" value={profile ? (`${profile.firstName || ''} ${profile.lastName || ''}`.trim() || 'Not Set') : 'Loading...'}/>
               </div>
             </div>
           </div>

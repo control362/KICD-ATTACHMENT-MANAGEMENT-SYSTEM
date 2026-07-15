@@ -71,6 +71,9 @@ public class Opportunity {
     @Column(nullable = false)
     private Boolean featured = false;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;

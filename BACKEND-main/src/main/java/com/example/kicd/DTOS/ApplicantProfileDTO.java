@@ -41,4 +41,6 @@ public class ApplicantProfileDTO {
 
     private String bio;
     private String profilePhotoUrl;
+    private String idDocumentUrl;
+    private String resumeUrl;
 }

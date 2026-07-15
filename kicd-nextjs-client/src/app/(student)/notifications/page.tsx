@@ -35,10 +35,12 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="p-lg lg:p-xl max-w-4xl">
-      <header className="mb-8">
-        <h2 className="text-3xl font-bold text-primary tracking-tight">Notifications</h2>
-        <p className="text-lg text-on-surface-variant mt-1">Stay updated on your application status.</p>
+    <div className="p-lg lg:p-xl max-w-[1440px] mx-auto w-full">
+      <header className="mb-xl flex items-center justify-between">
+        <div>
+          <h2 className="font-headline-lg text-headline-lg md:font-display-lg md:text-display-lg text-primary tracking-tight">Notifications</h2>
+          <p className="font-body-md text-body-md text-on-surface-variant mt-xs">Stay updated on your application status.</p>
+        </div>
       </header>
       
       <div className="bg-surface-default border border-border-light rounded-xl p-lg shadow-sm">

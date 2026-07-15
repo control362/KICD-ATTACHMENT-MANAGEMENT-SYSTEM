@@ -42,6 +42,9 @@ public class OpportunityRequest {
     private LocalDate endDate;
     private Boolean featured;
 
+    @NotBlank(message = "Image URL is required")
+    private String imageUrl;
+
     private List<OpportunityDocumentRequest> documents;
 
     @Data
