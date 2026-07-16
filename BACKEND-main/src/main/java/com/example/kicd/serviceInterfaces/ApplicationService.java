@@ -15,7 +15,7 @@ public interface ApplicationService {
     List<Application> getApprovedApplications();
     List<Application> getRejectedApplications();
     Application approveApplication(Long applicationId, Long hrId);
-    Application rejectApplication(Long applicationId, Long hrId);
+    Application rejectApplication(Long applicationId, Long hrId, String reason);
     
     Application getApplication(Long id);
     List<Application> getAllApplications();

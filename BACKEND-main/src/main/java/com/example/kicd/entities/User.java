@@ -62,4 +62,11 @@ public class User extends BaseEntity {
 
     @Column(name = "profile_photo_url")
     private String profilePhotoUrl;
+
+    @Builder.Default
+    @Column(name = "mfa_enabled")
+    private Boolean mfaEnabled = false;
+
+    @Column(name = "mfa_secret")
+    private String mfaSecret;
 }

@@ -47,6 +47,39 @@ public class Application {
     @Column(name = "id_document_url", columnDefinition = "TEXT")
     private String idDocumentUrl;
 
+    @Column(name = "rejection_reason", length = 255)
+    private String rejectionReason;
+
+    @Column(name = "timesheet_logged_percentage")
+    private Integer timesheetLoggedPercentage;
+
+    @Column(name = "logbook_status", length = 50)
+    private String logbookStatus;
+
+    @Column(name = "compliance_risk", length = 50)
+    private String complianceRisk;
+
+    @Column(name = "overall_score", precision = 3, scale = 2)
+    private java.math.BigDecimal overallScore;
+
+    @Column(length = 50)
+    private String punctuality;
+
+    @Column(length = 50)
+    private String teamwork;
+
+    @Column(name = "supervisor_recommendation", length = 100)
+    private String supervisorRecommendation;
+
+    @Column(name = "exit_completion_status", length = 50)
+    private String exitCompletionStatus;
+
+    @Column(name = "conversion_status", length = 50)
+    private String conversionStatus;
+
+    @Column(name = "exit_survey_sentiment", precision = 3, scale = 2)
+    private java.math.BigDecimal exitSurveySentiment;
+
     @CreationTimestamp
     @Column(name = "submitted_at", nullable = false, updatable = false)
     private OffsetDateTime submittedAt;

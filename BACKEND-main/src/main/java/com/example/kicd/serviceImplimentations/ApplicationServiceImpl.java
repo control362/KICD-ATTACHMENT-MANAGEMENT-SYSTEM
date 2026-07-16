@@ -169,7 +169,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     @Transactional
-    public Application rejectApplication(Long applicationId, Long hrId) {
+    public Application rejectApplication(Long applicationId, Long hrId, String reason) {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
 
@@ -179,6 +179,9 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setStatus("REJECTED");
         application.setApprovedBy(hr);
         application.setApprovalDate(java.time.LocalDateTime.now());
+        if (reason != null && !reason.trim().isEmpty()) {
+            application.setRejectionReason(reason);
+        }
 
         return applicationRepository.save(application);
     }

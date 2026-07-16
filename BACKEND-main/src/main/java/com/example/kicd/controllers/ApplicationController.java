@@ -91,8 +91,9 @@ public class ApplicationController {
     @PutMapping("/{applicationId}/reject")
     public Application rejectApplication(
             @AuthenticationPrincipal UserPrincipal principal,
-            @PathVariable Long applicationId) {
-        return applicationService.rejectApplication(applicationId, principal.getUserId());
+            @PathVariable Long applicationId,
+            @RequestParam(required = false) String reason) {
+        return applicationService.rejectApplication(applicationId, principal.getUserId(), reason);
     }
 
     @GetMapping

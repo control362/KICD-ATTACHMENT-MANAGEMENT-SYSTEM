@@ -74,6 +74,9 @@ public class Opportunity {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "monthly_stipend", precision = 10, scale = 2)
+    private java.math.BigDecimal monthlyStipend;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;

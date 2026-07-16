@@ -106,6 +106,9 @@ public class SecurityConfig {
                         // the service layer enforces that a STUDENT can only touch their own record.
                         .requestMatchers(HttpMethod.GET, "/api/applications/*").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/applications/*/submit", "/api/applications/*/status").authenticated()
+                        
+                        // --- Actuator (System Health/Metrics) ---
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
 
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()

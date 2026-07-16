@@ -104,6 +104,12 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- ACTUATOR FOR TELEMETRY -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
 		<!-- TESTING -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
