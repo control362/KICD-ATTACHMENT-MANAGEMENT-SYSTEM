@@ -18,6 +18,7 @@ export default function StaffManagement() {
   const [error, setError] = useState("");
   const toast = useToast();
   const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
@@ -145,8 +146,18 @@ export default function StaffManagement() {
 
       {/* Data Table */}
       <div className="bg-white border border-outline-variant rounded-2xl shadow-sm overflow-hidden flex flex-col">
-        <div className="px-6 py-4 border-b border-surface-container-highest flex justify-between items-center bg-white">
+        <div className="px-6 py-4 border-b border-surface-container-highest flex flex-col md:flex-row md:justify-between md:items-center gap-4 bg-white">
           <h3 className="text-xl font-bold text-primary tracking-tight">System Users</h3>
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+            <input 
+              type="text" 
+              placeholder="Search staff by email or role..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 w-full md:w-72 text-sm font-medium"
+            />
+          </div>
         </div>
         <div className="bg-surface-container-lowest min-h-[300px]">
           {loading ? (
@@ -170,39 +181,55 @@ export default function StaffManagement() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-surface-container-highest">
-                  {staffList.map((u) => (
-                    <tr key={u.userId} className="hover:bg-surface-container-low transition-colors group">
-                      <td className="py-4 px-6 text-on-surface-variant font-medium">{u.userId}</td>
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                           <div className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold shrink-0 shadow-sm text-xs">
-                            {u.email.charAt(0).toUpperCase()}
+                  {(() => {
+                    const filteredStaff = staffList.filter(u => 
+                      !searchQuery || 
+                      u.email.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                      (u.role?.roleName || '').toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                    
+                    if (filteredStaff.length === 0) {
+                      return (
+                        <tr>
+                          <td colSpan={5} className="py-16 text-center text-on-surface-variant font-medium">No staff members match your search criteria.</td>
+                        </tr>
+                      );
+                    }
+
+                    return filteredStaff.map((u) => (
+                      <tr key={u.userId} className="hover:bg-surface-container-low transition-colors group">
+                        <td className="py-4 px-6 text-on-surface-variant font-medium">{u.userId}</td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                             <div className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold shrink-0 shadow-sm text-xs">
+                              {u.email.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="font-bold text-on-surface group-hover:text-primary transition-colors">{u.email}</span>
                           </div>
-                          <span className="font-bold text-on-surface group-hover:text-primary transition-colors">{u.email}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-on-surface-variant font-medium">
-                        <span className="px-2 py-1 bg-surface-container rounded text-xs font-bold uppercase tracking-wider">{u.role?.roleName?.replace('ROLE_', '') || "—"}</span>
-                      </td>
-                      <td className="py-4 px-6">
-                        {u.isActive ? (
-                           <span className="px-3 py-1 bg-success/10 text-success text-xs font-bold rounded-full">Active</span>
-                        ) : (
-                           <span className="px-3 py-1 bg-danger-container text-danger text-xs font-bold rounded-full">Suspended</span>
-                        )}
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => openModal("edit", u)} className="p-2 rounded-lg text-on-surface-variant hover:bg-primary-container hover:text-white transition-colors">
-                            <span className="material-symbols-outlined text-[18px]">edit</span>
-                          </button>
-                          <button onClick={() => setDeleteUserId(u.userId)} className="p-2 rounded-lg text-danger hover:bg-danger-container transition-colors">
-                            <span className="material-symbols-outlined text-[18px]">delete</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="py-4 px-6 text-on-surface-variant font-medium">
+                          <span className="px-2 py-1 bg-surface-container rounded text-xs font-bold uppercase tracking-wider">{u.role?.roleName?.replace('ROLE_', '') || "—"}</span>
+                        </td>
+                        <td className="py-4 px-6">
+                          {u.isActive ? (
+                             <span className="px-3 py-1 bg-success/10 text-success text-xs font-bold rounded-full">Active</span>
+                          ) : (
+                             <span className="px-3 py-1 bg-danger-container text-danger text-xs font-bold rounded-full">Suspended</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button onClick={() => openModal("edit", u)} className="p-2 rounded-lg text-on-surface-variant hover:bg-primary-container hover:text-white transition-colors">
+                              <span className="material-symbols-outlined text-[18px]">edit</span>
+                            </button>
+                            <button onClick={() => setDeleteUserId(u.userId)} className="p-2 rounded-lg text-danger hover:bg-danger-container transition-colors">
+                              <span className="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ));
+                  })()}
                 </tbody>
               </table>
             </div>

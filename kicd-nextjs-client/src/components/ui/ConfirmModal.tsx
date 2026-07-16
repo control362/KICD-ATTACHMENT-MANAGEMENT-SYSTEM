@@ -11,6 +11,7 @@ interface ConfirmModalProps {
   confirmVariant?: "danger" | "primary";
   onConfirm: () => void;
   onCancel: () => void;
+  children?: React.ReactNode;
 }
 
 export function ConfirmModal({
@@ -22,6 +23,7 @@ export function ConfirmModal({
   confirmVariant = "danger",
   onConfirm,
   onCancel,
+  children,
 }: ConfirmModalProps) {
   if (!isOpen) return null;
 
@@ -35,6 +37,7 @@ export function ConfirmModal({
         <div className="p-6">
           <h2 className="text-xl font-bold text-on-surface mb-2">{title}</h2>
           <p className="text-on-surface-variant text-base leading-relaxed">{message}</p>
+          {children && <div className="mt-4">{children}</div>}
         </div>
         <div className="bg-surface-container-lowest px-6 py-4 flex justify-end gap-3 border-t border-border-light">
           <button

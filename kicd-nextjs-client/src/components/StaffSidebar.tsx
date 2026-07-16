@@ -12,6 +12,7 @@ export function StaffSidebar() {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
 
   const isHomePage = pathname === "/";
+  const isHr = user?.role === "HR_OFFICER";
 
   // When navigating, if it's the home page, auto-close the drawer.
   useEffect(() => {
@@ -79,13 +80,15 @@ export function StaffSidebar() {
             </button>
           </div>
           <nav className="flex flex-col gap-2 relative flex-1 overflow-y-auto">
-            {navItem("/", "home", "Home")}
-            {navItem("/reviewer/dashboard", "dashboard", "Dashboard")}
-            {navItem("/reviewer/applications", "description", "Applications")}
-            {navItem("/reviewer/opportunities", "work", "Opportunities")}
+            {isAdmin && navItem("/reviewer/sysadmin", "dashboard", "Dashboard")}
+            {isHr && navItem("/reviewer/dashboard", "dashboard", "Dashboard")}
+            {isHr && navItem("/", "home", "Home")}
+            {isHr && navItem("/reviewer/applications", "description", "Applications")}
+            {isHr && navItem("/reviewer/opportunities", "work", "Opportunities")}
             {navItem("/reviewer/departments", "domain", "Departments")}
-            {navItem("/reviewer/reports", "bar_chart", "Reports")}
-            {isAdmin && navItem("/reviewer/staff", "group", "Staff")}
+            {isHr && navItem("/reviewer/reports", "bar_chart", "Reports")}
+            {isAdmin && navItem("/reviewer/sysadmin/reports", "print", "Reports")}
+            {isAdmin && navItem("/reviewer/staff", "group", "Staff Management")}
             {navItem("/reviewer/settings", "settings", "Settings")}
           </nav>
           <div className="mt-auto pt-6 px-1">
@@ -126,13 +129,15 @@ export function StaffSidebar() {
       )}
 
       <nav className="flex flex-col gap-2 relative flex-1">
-        {navItem("/", "home", "Home")}
-        {navItem("/reviewer/dashboard", "dashboard", "Dashboard")}
-        {navItem("/reviewer/applications", "description", "Applications")}
-        {navItem("/reviewer/opportunities", "work", "Opportunities")}
+        {isAdmin && navItem("/reviewer/sysadmin", "dashboard", "Dashboard")}
+        {isHr && navItem("/reviewer/dashboard", "dashboard", "Dashboard")}
+        {isHr && navItem("/", "home", "Home")}
+        {isHr && navItem("/reviewer/applications", "description", "Applications")}
+        {isHr && navItem("/reviewer/opportunities", "work", "Opportunities")}
         {navItem("/reviewer/departments", "domain", "Departments")}
-        {navItem("/reviewer/reports", "bar_chart", "Reports")}
-        {isAdmin && navItem("/reviewer/staff", "group", "Staff")}
+        {isHr && navItem("/reviewer/reports", "bar_chart", "Reports")}
+        {isAdmin && navItem("/reviewer/sysadmin/reports", "print", "Reports")}
+        {isAdmin && navItem("/reviewer/staff", "group", "Staff Management")}
         {navItem("/reviewer/settings", "settings", "Settings")}
       </nav>
       <div className="mt-auto pt-6 px-1">

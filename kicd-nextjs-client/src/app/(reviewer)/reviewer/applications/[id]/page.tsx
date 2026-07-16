@@ -22,6 +22,7 @@ export default function ReviewDetail({ params }: { params: Promise<{ id: string 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   useEffect(() => {
     async function loadApp() {
@@ -38,11 +39,20 @@ export default function ReviewDetail({ params }: { params: Promise<{ id: string 
   }, [id]);
 
   const decide = async (action: 'approve' | 'reject') => {
+    if (action === 'reject' && !rejectionReason) {
+      toast.error("Please select a reason for rejection.");
+      return;
+    }
     try {
-      const updatedApp = await api.put(`/api/applications/${id}/${action}`, {});
+      let url = `/api/applications/${id}/${action}`;
+      if (action === 'reject' && rejectionReason) {
+        url += `?reason=${encodeURIComponent(rejectionReason)}`;
+      }
+      const updatedApp = await api.put(url, {});
       setApp(updatedApp);
       toast.success(`Application ${action === "approve" ? "approved" : "rejected"}.`);
       setShowConfirm(false);
+      setRejectionReason(""); // Reset on success
     } catch (err: any) {
       toast.error(err instanceof ApiError ? err.message : "Could not save the decision.");
     }
@@ -232,8 +242,32 @@ export default function ReviewDetail({ params }: { params: Promise<{ id: string 
         cancelText="Cancel"
         confirmVariant="danger"
         onConfirm={() => decide('reject')}
-        onCancel={() => setShowConfirm(false)}
-      />
+        onCancel={() => {
+          setShowConfirm(false);
+          setRejectionReason("");
+        }}
+      >
+        <div className="flex flex-col gap-2">
+          <label htmlFor="rejectionReason" className="text-sm font-semibold text-on-surface">
+            Reason for Rejection (Required)
+          </label>
+          <select
+            id="rejectionReason"
+            value={rejectionReason}
+            onChange={(e) => setRejectionReason(e.target.value)}
+            className="w-full px-4 py-2 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-primary bg-white text-sm"
+          >
+            <option value="" disabled>Select a reason...</option>
+            <option value="Lack of Prerequisite Skills">Lack of Prerequisite Skills</option>
+            <option value="No Vacancies in Department">No Vacancies in Department</option>
+            <option value="Incomplete/Invalid Documents">Incomplete/Invalid Documents</option>
+            <option value="Poor Interview Assessment">Poor Interview Assessment</option>
+            <option value="Incompatible Dates">Incompatible Dates</option>
+            <option value="Did Not Meet Minimum GPA">Did Not Meet Minimum GPA</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </ConfirmModal>
     </div>
   );
 }

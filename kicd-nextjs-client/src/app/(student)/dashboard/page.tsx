@@ -173,7 +173,7 @@ export default function StudentDashboard() {
                 <span className="material-symbols-outlined">edit</span>
                 Edit Profile
               </Link>
-              <Link href="/" className="w-full py-4 bg-primary text-on-primary rounded-xl font-headline-sm text-headline-sm flex items-center justify-center gap-md shadow-lg hover:-translate-y-1 transition-all duration-200">
+              <Link href="/opportunities" className="w-full py-4 bg-primary text-on-primary rounded-xl font-headline-sm text-headline-sm flex items-center justify-center gap-md shadow-lg hover:-translate-y-1 transition-all duration-200">
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
                 Find Attachment
               </Link>
