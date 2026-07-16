@@ -37,10 +37,10 @@
 | Document Title     | Software Requirements Specification — KICD Attachment Management System |
 | Version            | 1.0                          |
 | Status             | Approved |
-| Date               | 2026-07-15                   |
-| Prepared By        | Principal Requirements Engineer |
-| Reviewed By        | Architecture & Engineering Team |
-| Approved By        | System Stakeholders |
+| Date               | 2026-05-15                   |
+| Prepared By        | Amy, Moses and Reagan |
+| Reviewed By        | Architecture & Engineering Team KICD |
+| Approved By        | System Stakeholders KICD|
 | Classification     | Internal |
 
 ## Change Log
